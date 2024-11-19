@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Entity, EntityMapping } from 'ngx-entity-service';
+import { Entity, EntityCache, EntityMapping } from 'ngx-entity-service';
 import { Observable, tap } from 'rxjs';
 import { AppInjector } from 'src/app/app-injector';
 import { DoubtfireConstants } from 'src/app/config/constants/doubtfire-constants';
-import { Grade, GroupSet, TutorialStream, Unit } from './doubtfire-model';
+import { FeedbackTemplate, Grade, GroupSet, TutorialStream, Unit } from './doubtfire-model';
 import { TaskDefinitionService } from '../services/task-definition.service';
 
 export type UploadRequirement = { key: string; name: string; type: string; tiiCheck?: boolean; tiiPct?: number };
@@ -43,6 +43,9 @@ export class TaskDefinition extends Entity {
   overseerImageId: number;
   assessmentEnabled: boolean;
   mossLanguage: string = 'moss c';
+
+  public readonly feedbackTemplateCache: EntityCache<FeedbackTemplate> =
+    new EntityCache<FeedbackTemplate>();
 
   readonly unit: Unit;
 
