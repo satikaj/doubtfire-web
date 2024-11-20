@@ -207,7 +207,6 @@ import {TaskDefinitionDatesComponent} from './units/states/edit/directives/unit-
 import {TaskDefinitionUploadComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-upload/task-definition-upload.component';
 import {TaskDefinitionOptionsComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-options/task-definition-options.component';
 import {TaskDefinitionResourcesComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-resources/task-definition-resources.component';
-import {TaskDefinitionFeedbackComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-feedback/task-definition-feedback.component';
 import {TaskDefinitionOverseerComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-overseer/task-definition-overseer.component';
 import {TaskDefinitionScormComponent} from './units/states/edit/directives/unit-tasks-editor/task-definition-editor/task-definition-scorm/task-definition-scorm.component';
 import {UnitAnalyticsComponent} from './units/states/analytics/unit-analytics-route.component';
@@ -239,6 +238,7 @@ import {TestAttemptService} from './api/services/test-attempt.service';
 import {ScormExtensionCommentComponent} from './tasks/task-comments-viewer/scorm-extension-comment/scorm-extension-comment.component';
 import {ScormExtensionModalComponent} from './common/modals/scorm-extension-modal/scorm-extension-modal.component';
 import {FeedbackTemplateService} from './api/services/feedback-template.service';
+import {FeedbackTemplateEditorComponent} from './common/feedback-template/feedback-template-editor.component';
 
 // See https://stackoverflow.com/questions/55721254/how-to-change-mat-datepicker-date-format-to-dd-mm-yyyy-in-simplest-way/58189036#58189036
 const MY_DATE_FORMAT = {
@@ -289,7 +289,6 @@ const MY_DATE_FORMAT = {
     TaskDefinitionUploadComponent,
     TaskDefinitionOptionsComponent,
     TaskDefinitionResourcesComponent,
-    TaskDefinitionFeedbackComponent,
     TaskDefinitionOverseerComponent,
     TaskDefinitionScormComponent,
     UnitAnalyticsComponent,
@@ -360,6 +359,7 @@ const MY_DATE_FORMAT = {
     TaskScormCardComponent,
     ScormExtensionCommentComponent,
     ScormExtensionModalComponent,
+    FeedbackTemplateEditorComponent,
   ],
   // Services we provide
   providers: [
