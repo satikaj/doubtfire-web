@@ -1,7 +1,23 @@
-import {AfterViewInit, Component, Inject, Input, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  inject,
+  Inject,
+  Input,
+  model,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
-import {TaskDefinition, Unit, LearningOutcome, LearningOutcomeService, FeedbackTemplate} from 'src/app/api/models/doubtfire-model';
+import {
+  TaskDefinition,
+  Unit,
+  LearningOutcome,
+  LearningOutcomeService,
+  FeedbackTemplate,
+} from 'src/app/api/models/doubtfire-model';
 import {TaskDefinitionService} from 'src/app/api/services/task-definition.service';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {MatSort, Sort} from '@angular/material/sort';
@@ -12,6 +28,10 @@ import {
 } from 'src/app/ajs-upgraded-providers';
 import {Subscription} from 'rxjs';
 import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 
 @Component({
   selector: 'f-feedback-template-editor',
@@ -27,7 +47,7 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   public outcomeSource: MatTableDataSource<LearningOutcome>;
   public outcomeColumns: string[] = [
     'number',
-    'abbreviation',
+    'tag',
     'name',
     'description',
     'learningOutcomeAction',
@@ -41,7 +61,7 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
-    'learningOutcome',
+    'number',
     'chipText',
     'description',
     'commentText',
@@ -138,7 +158,7 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
       switch (sort.active) {
         case 'number':
           return this.compare(a.iloNumber, b.iloNumber, isAsc);
-        case 'abbreviation':
+        case 'tag':
           return this.compare(a.abbreviation, b.abbreviation, isAsc);
         case 'name':
           return this.compare(a.name, b.name, isAsc);
@@ -161,8 +181,8 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     this.templateSource.data = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
-        case 'learningOutcome':
-          return this.compare(a.learningOutcome, b.learningOutcome, isAsc);
+        case 'number':
+          return this.compare(a.id, b.id, isAsc);
         case 'chipText':
           return this.compare(a.chipText, b.chipText, isAsc);
         case 'description':
@@ -259,12 +279,57 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   public createFeedbackTemplate() {
     const feedbackTemplate = new FeedbackTemplate(this.taskDefinition);
 
-    feedbackTemplate.learningOutcome = 'TLO';
+    feedbackTemplate.id = 0;
     feedbackTemplate.chipText = 'lorem';
     feedbackTemplate.description = 'Lorem ipsum dolor';
     feedbackTemplate.commentText = 'Lorem dolor';
     feedbackTemplate.summaryText = 'Lorem ipsum';
 
     this.selectedTemplate = feedbackTemplate;
+  }
+
+  readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+  readonly currentConnectedOutcome = model('');
+  readonly connectedOutcomes = signal([]);
+  readonly allOutcomes: string[] = ['TLO1', 'TLO2', 'TLO3', 'ULO1', 'ULO2'];
+  readonly filteredOutcomes = computed(() => {
+    const currentOutcome = this.currentConnectedOutcome().toLowerCase();
+    return currentOutcome
+      ? this.allOutcomes.filter((outcome) => outcome.toLowerCase().includes(currentOutcome))
+      : this.allOutcomes.slice();
+  });
+
+  readonly announcer = inject(LiveAnnouncer);
+
+  add(event: MatChipInputEvent): void {
+    const value = (event.value || '').trim();
+
+    if (value) {
+      this.connectedOutcomes.update((connectedOutcomes) => [...connectedOutcomes, value]);
+    }
+
+    this.currentConnectedOutcome.set('');
+  }
+
+  remove(outcome: string): void {
+    this.connectedOutcomes.update((connectedOutcomes) => {
+      const index = connectedOutcomes.indexOf(outcome);
+      if (index < 0) {
+        return connectedOutcomes;
+      }
+
+      connectedOutcomes.splice(index, 1);
+      this.announcer.announce(`Removed ${outcome}`);
+      return [...connectedOutcomes];
+    });
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.connectedOutcomes.update((connectedOutcomes) => [
+      ...connectedOutcomes,
+      event.option.viewValue,
+    ]);
+    this.currentConnectedOutcome.set('');
+    event.option.deselect();
   }
 }
