@@ -82,6 +82,7 @@ export class TaskCommentComposerComponent implements DoCheck {
   emojiRegex: RegExp = /(?:\:)(.*?)(?=\:|$)/;
   emojiSearchResults: EmojiData[] = [];
   emojiMatch: string;
+  showFeedbackTemplatePicker: boolean = false;
   recording = false;
   cagStartWidth: number;
 
@@ -155,6 +156,7 @@ export class TaskCommentComposerComponent implements DoCheck {
     e.preventDefault();
     this.emojiSearchMode = false;
     this.showEmojiPicker = false;
+    this.showFeedbackTemplatePicker = false;
     if (this.input.first.nativeElement.innerText.trim() !== '') {
       this.addComment();
     }

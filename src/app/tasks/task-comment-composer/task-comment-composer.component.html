@@ -1,3 +1,8 @@
+<f-task-feedback-templates
+  [hidden]="!this.showFeedbackTemplatePicker"
+  class="feedback-template-picker"
+></f-task-feedback-templates>
+
 <emoji-mart
   [darkMode]="false"
   [isNative]="true"
@@ -171,6 +176,17 @@
           aria-label="Emoji picker button"
         >
           emoji_emotions</mat-icon
+        >
+      </div>
+      <div id="innerButtons" [hidden]="recording">
+        <mat-icon
+          matTooltip="Choose feedback templates"
+          matTooltipShowDelay="400"
+          id="feedbackTemplateButton"
+          (click)="this.showFeedbackTemplatePicker = !this.showFeedbackTemplatePicker"
+          aria-label="Feedback template button"
+        >
+          task</mat-icon
         >
       </div>
     </div>

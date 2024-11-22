@@ -95,6 +95,13 @@ $emoji-color: lighten(
   border-color: darken($color: white, $amount: 10);
 }
 
+.feedback-template-picker {
+  z-index: 1060;
+  position: absolute;
+  right: 26px;
+  bottom: 150px;
+}
+
 #replyContainer {
   margin: 0.4em 1em -0.2em 1em;
   font-size: 14px;
