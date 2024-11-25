@@ -32,13 +32,14 @@ import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {FileDownloaderService} from '../file-downloader/file-downloader.service';
 
 @Component({
   selector: 'f-feedback-template-editor',
   templateUrl: 'feedback-template-editor.component.html',
 })
 export class FeedbackTemplateEditorComponent implements AfterViewInit {
-  @Input() taskDefinition: TaskDefinition;
+  @Input() context: TaskDefinition | Unit;
 
   @ViewChild(MatTable, {static: false}) outcomeTable: MatTable<LearningOutcome>;
   @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
@@ -52,7 +53,6 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     'description',
     'learningOutcomeAction',
   ];
-  public outcomeFilter: string;
   public selectedOutcome: LearningOutcome;
 
   @ViewChild(MatTable, {static: false}) templateTable: MatTable<FeedbackTemplate>;
@@ -68,7 +68,6 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     'summaryText',
     'feedbackTemplateAction',
   ];
-  public templateFilter: string;
   public selectedTemplate: FeedbackTemplate;
 
   constructor(
@@ -76,28 +75,42 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     private taskDefinitionService: TaskDefinitionService,
     private learningOutcomeService: LearningOutcomeService,
     private feedbackTemplateService: FeedbackTemplateService,
+    private fileDownloaderService: FileDownloaderService,
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
   ) {}
 
-  public get unit(): Unit {
-    return this.taskDefinition?.unit;
-  }
-
   ngAfterViewInit(): void {
     this.subscriptions.push(
-      this.unit.learningOutcomesCache.values.subscribe((learningOutcomes) => {
+      this.context.learningOutcomesCache.values.subscribe((learningOutcomes) => {
         this.outcomeSource = new MatTableDataSource<LearningOutcome>(learningOutcomes);
         this.outcomeSource.paginator = this.outcomePaginator;
         this.outcomeSource.sort = this.outcomeSort;
-        this.outcomeSource.filterPredicate = (data: any, filter: string) => data.matches(filter);
+        this.outcomeSource.filterPredicate = (data: LearningOutcome, filter: string) => {
+          const filterValue = filter.trim().toLowerCase();
+          return (
+            data.iloNumber.toString().includes(filterValue) ||
+            data.abbreviation.toLowerCase().includes(filterValue) ||
+            data.name.toLowerCase().includes(filterValue) ||
+            data.description.toLowerCase().includes(filterValue)
+          );
+        };
       }),
-      this.taskDefinition.feedbackTemplateCache.values.subscribe((feedbackTemplates) => {
+      this.context.feedbackTemplateCache.values.subscribe((feedbackTemplates) => {
         this.templateSource = new MatTableDataSource<FeedbackTemplate>(feedbackTemplates);
         this.templateSource.paginator = this.templatePaginator;
         this.templateSource.sort = this.templateSort;
-        this.templateSource.filterPredicate = (data: any, filter: string) => data.matches(filter);
+        this.templateSource.filterPredicate = (data: FeedbackTemplate, filter: string) => {
+          const filterValue = filter.trim().toLowerCase();
+          return (
+            data.id.toString().includes(filterValue) ||
+            data.chipText.toLowerCase().includes(filterValue) ||
+            data.commentText.toLowerCase().includes(filterValue) ||
+            data.summaryText.toLowerCase().includes(filterValue) ||
+            data.description.toLowerCase().includes(filterValue)
+          );
+        };
       }),
     );
   }
@@ -201,19 +214,17 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
-  applyOutcomeFilter(filterValue: string) {
-    this.outcomeSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.outcomeSource.paginator) {
-      this.outcomeSource.paginator.firstPage();
-    }
-  }
-
-  applyTemplateFilter(filterValue: string) {
-    this.templateSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.templateSource.paginator) {
-      this.templateSource.paginator.firstPage();
+  applyFilter(filterValue: string, table: string) {
+    if (table === 'outcome') {
+      this.outcomeSource.filter = filterValue;
+      if (this.outcomeSource.paginator) {
+        this.outcomeSource.paginator.firstPage();
+      }
+    } else if (table === 'template') {
+      this.templateSource.filter = filterValue;
+      if (this.templateSource.paginator) {
+        this.templateSource.paginator.firstPage();
+      }
     }
   }
 
@@ -230,6 +241,15 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
       'Delete learning outcome',
       'Are you sure you want to delete this outcome? This action is final.',
       () => {
+        this.learningOutcomeService
+          .delete(
+            {id: learningOutcome.id, unitId: this.context.id},
+            {entity: learningOutcome, cache: this.context.learningOutcomesCache},
+          )
+          .subscribe({
+            next: () => this.alerts.success('Learning outcome deleted'),
+            error: () => this.alerts.error('Failed to delete learning outcome. Please try again.'),
+          });
         this.alerts.success('Outcome deleted');
       },
     );
@@ -245,45 +265,58 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     );
   }
 
-  public uploadLearningOutcomesCsv() {
+  public uploadCsv(type: 'Learning Outcomes' | 'Feedback Templates') {
+    const url =
+      type === 'Learning Outcomes'
+        ? this.context.getOutcomeBatchUploadUrl()
+        : this.context.getFeedbackTemplateBatchUploadUrl();
+
     this.csvUploadModal.show(
-      'Upload Learning Outcomes as CSV',
+      `Upload ${type} as CSV`,
       'Test message',
-      {file: {name: 'Learning Outcome CSV Data', type: 'csv'}},
-      this.unit.getTaskDefinitionBatchUploadUrl(),
-      (response: any) => {},
+      {file: {name: `${type} CSV Data`, type: 'csv'}},
+      url,
+      (response: any) => {
+        this.csvResultModalService.show(`${type} CSV Upload Results`, response);
+        if (response.success.length > 0) {
+          this.context.refresh();
+        }
+      },
     );
   }
 
-  public uploadFeedbackTemplatesCsv() {
-    this.csvUploadModal.show(
-      'Upload Feedback Templates as CSV',
-      'Test message',
-      {file: {name: 'Feedback Template CSV Data', type: 'csv'}},
-      this.unit.getTaskDefinitionBatchUploadUrl(),
-      (response: any) => {},
-    );
+  public downloadCsv(type: 'learning-outcomes' | 'feedback-templates') {
+    let name: string = '';
+    if (this.context instanceof TaskDefinition) name = this.context.abbreviation;
+    else if (this.context instanceof Unit) name = this.context.code;
+
+    const url =
+      type === 'learning-outcomes'
+        ? this.context.getOutcomeBatchUploadUrl()
+        : this.context.getFeedbackTemplateBatchUploadUrl();
+
+    this.fileDownloaderService.downloadFile(url, `${name}-${type}.csv`);
   }
 
   public createLearningOutcome() {
     const learningOutcome = new LearningOutcome();
 
     learningOutcome.iloNumber = 1;
-    learningOutcome.abbreviation = 'lm';
-    learningOutcome.name = 'lorem';
-    learningOutcome.description = 'Lorem ipsum dolor';
+    learningOutcome.abbreviation = '';
+    learningOutcome.name = '';
+    learningOutcome.description = '';
 
     this.selectedOutcome = learningOutcome;
   }
 
   public createFeedbackTemplate() {
-    const feedbackTemplate = new FeedbackTemplate(this.taskDefinition);
+    const feedbackTemplate = new FeedbackTemplate(this.context);
 
     feedbackTemplate.id = 0;
-    feedbackTemplate.chipText = 'lorem';
-    feedbackTemplate.description = 'Lorem ipsum dolor';
-    feedbackTemplate.commentText = 'Lorem dolor';
-    feedbackTemplate.summaryText = 'Lorem ipsum';
+    feedbackTemplate.chipText = '';
+    feedbackTemplate.description = '';
+    feedbackTemplate.commentText = '';
+    feedbackTemplate.summaryText = '';
 
     this.selectedTemplate = feedbackTemplate;
   }

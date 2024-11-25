@@ -1,7 +1,7 @@
 import {Entity, EntityMapping} from 'ngx-entity-service';
 import {Observable} from 'rxjs';
 import {AppInjector} from 'src/app/app-injector';
-import {TaskDefinition} from './task-definition';
+import {TaskDefinition, Unit} from './doubtfire-model';
 import {FeedbackTemplateService} from '../services/feedback-template.service';
 
 export class FeedbackTemplate extends Entity {
@@ -12,11 +12,11 @@ export class FeedbackTemplate extends Entity {
   commentText: string;
   summaryText: string;
 
-  readonly taskDefinition: TaskDefinition;
+  readonly context: TaskDefinition | Unit;
 
-  constructor(taskDef: TaskDefinition) {
+  constructor(context: TaskDefinition | Unit) {
     super();
-    this.taskDefinition = taskDef;
+    this.context = context;
   }
 
   public toJson<T extends Entity>(mappingData: EntityMapping<T>, ignoreKeys?: string[]): object {
@@ -31,18 +31,18 @@ export class FeedbackTemplate extends Entity {
     if (this.isNew) {
       return svc.create(
         {
-          taskDefId: this.taskDefinition.id,
+          contextId: this.context.id,
         },
         {
           entity: this,
-          cache: this.taskDefinition.feedbackTemplateCache,
-          constructorParams: this.taskDefinition,
+          cache: this.context.feedbackTemplateCache,
+          constructorParams: this.context,
         },
       );
     } else {
       return svc.update(
         {
-          taskDefId: this.taskDefinition.id,
+          contextId: this.context.id,
           id: this.id,
         },
         {entity: this},
@@ -72,7 +72,7 @@ export class FeedbackTemplate extends Entity {
     return !this.id;
   }
 
-  public get taskDefId(): number {
-    return this.taskDefinition.id;
+  public getContextId(): number {
+    return this.context.id;
   }
 }

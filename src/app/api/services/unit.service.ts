@@ -9,6 +9,7 @@ import { TaskDefinitionService } from './task-definition.service';
 import { GroupService } from './group.service';
 import { Observable } from 'rxjs';
 import { DoubtfireConstants } from 'src/app/config/constants/doubtfire-constants';
+import { FeedbackTemplateService } from './feedback-template.service';
 
 export type IloStats = {
   median: number;
@@ -32,7 +33,8 @@ export class UnitService extends CachedEntityService<Unit> {
     private taskDefinitionService: TaskDefinitionService,
     private taskOutcomeAlignmentService: TaskOutcomeAlignmentService,
     private groupSetService: GroupSetService,
-    private groupService: GroupService
+    private groupService: GroupService,
+    private feedbackTemplateService: FeedbackTemplateService,
   ) {
     super(httpClient, API_URL);
 
@@ -209,6 +211,18 @@ export class UnitService extends CachedEntityService<Unit> {
             );
           });
         }
+      },
+      {
+        keys: 'feedbackTemplates',
+        toEntityOp: (data: object, key: string, unit: Unit) => {
+          data[key]?.forEach((template) => {
+            unit.feedbackTemplateCache.getOrCreate(
+              template['id'],
+              this.feedbackTemplateService,
+              template,
+            );
+          });
+        },
       },
       // 'groupMemberships', - map to group memberships
     );

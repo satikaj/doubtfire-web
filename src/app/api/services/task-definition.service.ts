@@ -1,17 +1,22 @@
 import { CachedEntityService } from 'ngx-entity-service';
-import { TaskDefinition, Unit } from 'src/app/api/models/doubtfire-model';
+import { LearningOutcomeService, TaskDefinition, Unit } from 'src/app/api/models/doubtfire-model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import API_URL from 'src/app/config/constants/apiURL';
 import { MappingFunctions } from './mapping-fn';
 import { AppInjector } from 'src/app/app-injector';
 import { Observable } from 'rxjs';
+import { FeedbackTemplateService } from './feedback-template.service';
 
 @Injectable()
 export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
   protected readonly endpointFormat = 'units/:unitId:/task_definitions/:id:';
 
-  constructor(httpClient: HttpClient) {
+  constructor(
+    httpClient: HttpClient,
+    private learningOutcomeService: LearningOutcomeService,
+    private feedbackTemplateService: FeedbackTemplateService,
+  ) {
     super(httpClient, API_URL);
 
     this.mapping.addKeys(
@@ -108,7 +113,31 @@ export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
       'isGraded',
       'maxQualityPts',
       'overseerImageId',
-      'assessmentEnabled'
+      'assessmentEnabled',
+      {
+        keys: 'tlos',
+        toEntityOp: (data: object, key: string, taskDefinition: TaskDefinition) => {
+          data[key]?.forEach((tlo) => {
+            taskDefinition.learningOutcomesCache.getOrCreate(
+              tlo['id'],
+              this.learningOutcomeService,
+              tlo,
+            );
+          });
+        },
+      },
+      {
+        keys: 'feedbackTemplates',
+        toEntityOp: (data: object, key: string, taskDefinition: TaskDefinition) => {
+          data[key]?.forEach((template) => {
+            taskDefinition.feedbackTemplateCache.getOrCreate(
+              template['id'],
+              this.feedbackTemplateService,
+              template,
+            );
+          });
+        },
+      },
     );
 
     this.mapping.mapAllKeysToJsonExcept(

@@ -3,7 +3,7 @@ import {CachedEntityService} from 'ngx-entity-service';
 import {FeedbackTemplate} from '../models/feedback-template';
 import {HttpClient} from '@angular/common/http';
 import API_URL from 'src/app/config/constants/apiURL';
-import {TaskDefinition} from '../models/task-definition';
+import {TaskDefinition, Unit} from '../models/doubtfire-model';
 
 @Injectable()
 export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplate> {
@@ -22,7 +22,10 @@ export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplat
     );
   }
 
-  public override createInstanceFrom(json: object, other?: any): FeedbackTemplate {
-    return new FeedbackTemplate(other as TaskDefinition);
+  public override createInstanceFrom(
+    json: object,
+    other?: TaskDefinition | Unit,
+  ): FeedbackTemplate {
+    return new FeedbackTemplate(other);
   }
 }
