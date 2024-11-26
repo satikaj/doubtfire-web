@@ -327,9 +327,12 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   readonly allOutcomes: string[] = ['TLO1', 'TLO2', 'TLO3', 'ULO1', 'ULO2'];
   readonly filteredOutcomes = computed(() => {
     const currentOutcome = this.currentConnectedOutcome().toLowerCase();
-    return currentOutcome
-      ? this.allOutcomes.filter((outcome) => outcome.toLowerCase().includes(currentOutcome))
-      : this.allOutcomes.slice();
+    return this.allOutcomes.filter((outcome) => {
+      return (
+        !this.connectedOutcomes().includes(outcome) &&
+        (!currentOutcome || outcome.toLowerCase().includes(currentOutcome))
+      );
+    });
   });
 
   readonly announcer = inject(LiveAnnouncer);
