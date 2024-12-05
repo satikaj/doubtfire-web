@@ -236,7 +236,9 @@ export const DoubtfireAngularJSModule = angular.module('doubtfire', [
   'doubtfire.projects',
   'doubtfire.groups',
   'doubtfire.visualisations',
-]);
+]).config(['$locationProvider', ($locationProvider) => {
+  $locationProvider.html5Mode(true);
+}]);
 
 // Downgrade angular modules that we need...
 // factory -> service
