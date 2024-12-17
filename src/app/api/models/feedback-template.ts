@@ -6,11 +6,14 @@ import {FeedbackTemplateService} from '../services/feedback-template.service';
 
 export class FeedbackTemplate extends Entity {
   id: number;
-  learningOutcome: string;
+  type: 'Group' | 'Feedback';
   chipText: string;
   description: string;
   commentText: string;
   summaryText: string;
+  taskStatus: 'fix_and_resubmit' | 'discuss' | 'redo' | 'complete' | 'feedback_exceeded';
+  parent: number;
+  learningOutcome: number;
 
   readonly context: TaskDefinition | Unit;
 

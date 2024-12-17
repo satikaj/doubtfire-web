@@ -115,13 +115,13 @@ export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
       'overseerImageId',
       'assessmentEnabled',
       {
-        keys: 'tlos',
+        keys: 'ilos',
         toEntityOp: (data: object, key: string, taskDefinition: TaskDefinition) => {
-          data[key]?.forEach((tlo) => {
+          data[key]?.forEach(ilo => {
             taskDefinition.learningOutcomesCache.getOrCreate(
-              tlo['id'],
+              ilo['id'],
               this.learningOutcomeService,
-              tlo,
+              ilo,
             );
           });
         },

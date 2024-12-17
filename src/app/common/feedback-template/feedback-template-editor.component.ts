@@ -6,6 +6,8 @@ import {
   Inject,
   Input,
   model,
+  OnDestroy,
+  OnInit,
   signal,
   ViewChild,
 } from '@angular/core';
@@ -38,37 +40,42 @@ import {FileDownloaderService} from '../file-downloader/file-downloader.service'
   selector: 'f-feedback-template-editor',
   templateUrl: 'feedback-template-editor.component.html',
 })
-export class FeedbackTemplateEditorComponent implements AfterViewInit {
+export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() context: TaskDefinition | Unit;
 
-  @ViewChild(MatTable, {static: false}) outcomeTable: MatTable<LearningOutcome>;
+  @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
   @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
-  @ViewChild(MatPaginator, {static: false}) outcomePaginator: MatPaginator;
+  @ViewChild('outcomePaginator', {static: false}) outcomePaginator: MatPaginator;
 
   public outcomeSource: MatTableDataSource<LearningOutcome>;
   public outcomeColumns: string[] = [
-    'number',
-    'tag',
-    'name',
-    'description',
+    'abbreviation',
+    'shortDescription',
+    'fullOutcomeDescription',
+    'connectedOutcomes',
     'learningOutcomeAction',
   ];
   public selectedOutcome: LearningOutcome;
+  public abbreviationPrefix: 'TLO' | 'ULO' | 'GLO';
 
-  @ViewChild(MatTable, {static: false}) templateTable: MatTable<FeedbackTemplate>;
+  @ViewChild('templateTable', {static: false}) templateTable: MatTable<FeedbackTemplate>;
   @ViewChild(MatSort, {static: false}) templateSort: MatSort;
-  @ViewChild(MatPaginator, {static: false}) templatePaginator: MatPaginator;
+  @ViewChild('templatePaginator', {static: false}) templatePaginator: MatPaginator;
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
-    'number',
+    'parent',
     'chipText',
     'description',
     'commentText',
     'summaryText',
+    'taskStatus',
     'feedbackTemplateAction',
   ];
   public selectedTemplate: FeedbackTemplate;
+
+  private subscriptions: Subscription[] = [];
+  public allOutcomes: LearningOutcome[] = [];
 
   constructor(
     private alerts: AlertService,
@@ -81,6 +88,11 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     @Inject(confirmationModal) private confirmationModal: any,
   ) {}
 
+  ngOnInit(): void {
+    if (this.context instanceof TaskDefinition) this.abbreviationPrefix = 'TLO';
+    else if (this.context instanceof Unit) this.abbreviationPrefix = 'ULO';
+  }
+
   ngAfterViewInit(): void {
     this.subscriptions.push(
       this.context.learningOutcomesCache.values.subscribe((learningOutcomes) => {
@@ -90,10 +102,9 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
         this.outcomeSource.filterPredicate = (data: LearningOutcome, filter: string) => {
           const filterValue = filter.trim().toLowerCase();
           return (
-            data.iloNumber.toString().includes(filterValue) ||
             data.abbreviation.toLowerCase().includes(filterValue) ||
-            data.name.toLowerCase().includes(filterValue) ||
-            data.description.toLowerCase().includes(filterValue)
+            data.shortDescription.toLowerCase().includes(filterValue) ||
+            data.fullOutcomeDescription.toLowerCase().includes(filterValue)
           );
         };
       }),
@@ -112,14 +123,29 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
           );
         };
       }),
+      this.learningOutcomeService.globalOutcomes().subscribe((glos) => {
+        this.allOutcomes = [...this.allOutcomes, ...glos];
+      }),
     );
+
+    if (this.context instanceof TaskDefinition) {
+      this.subscriptions.push(
+        this.context.unit.learningOutcomesCache.values.subscribe((learningOutcomes) => {
+          this.allOutcomes = [...this.allOutcomes, ...learningOutcomes];
+        }),
+      );
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
   public saveLearningOutcome(learningOutcome: LearningOutcome) {
-    // learningOutcome.save().subscribe(() => {
-    //   this.alerts.success('Outcome saved');
-    //   learningOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
-    // });
+    learningOutcome.save().subscribe(() => {
+      this.alerts.success('Outcome saved');
+      learningOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+    });
   }
 
   public saveFeedbackTemplate(feedbackTemplate: FeedbackTemplate) {
@@ -129,20 +155,11 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     });
   }
 
-  private subscriptions: Subscription[] = [];
-  ngOnDestroy(): void {
-    this.subscriptions.forEach((s) => s.unsubscribe());
-  }
-
   public selectLearningOutcome(learningOutcome: LearningOutcome) {
     if (this.selectedOutcome === learningOutcome) {
       this.selectedOutcome = null;
     } else {
       this.selectedOutcome = learningOutcome;
-
-      // if (!this.selectedFeedbackTemplate.hasOriginalSaveData) {
-      //   this.selectedFeedbackTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
-      // }
     }
   }
 
@@ -169,14 +186,12 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     this.outcomeSource.data = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
-        case 'number':
-          return this.compare(a.iloNumber, b.iloNumber, isAsc);
-        case 'tag':
+        case 'abbreviation':
           return this.compare(a.abbreviation, b.abbreviation, isAsc);
-        case 'name':
-          return this.compare(a.name, b.name, isAsc);
-        case 'description':
-          return this.compare(a.description, b.description, isAsc);
+        case 'shortDescription':
+          return this.compare(a.shortDescription, b.shortDescription, isAsc);
+        case 'fullOutcomeDescription':
+          return this.compare(a.fullOutcomeDescription, b.fullOutcomeDescription, isAsc);
         default:
           return 0;
       }
@@ -194,16 +209,8 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     this.templateSource.data = data.sort((a, b) => {
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
-        case 'number':
-          return this.compare(a.id, b.id, isAsc);
         case 'chipText':
           return this.compare(a.chipText, b.chipText, isAsc);
-        case 'description':
-          return this.compare(a.description, b.description, isAsc);
-        case 'commentText':
-          return this.compare(a.commentText, b.commentText, isAsc);
-        case 'summaryText':
-          return this.compare(a.summaryText, b.summaryText, isAsc);
         default:
           return 0;
       }
@@ -243,14 +250,21 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
       () => {
         this.learningOutcomeService
           .delete(
-            {id: learningOutcome.id, unitId: this.context.id},
-            {entity: learningOutcome, cache: this.context.learningOutcomesCache},
+            {
+              contextType: learningOutcome.contextTypePaths[learningOutcome.contextType],
+              contextId: learningOutcome.contextId,
+              id: learningOutcome.id,
+            },
+            {
+              entity: learningOutcome,
+              cache: this.context.learningOutcomesCache,
+              endpointFormat: LearningOutcomeService.updateEndpoint,
+            },
           )
           .subscribe({
             next: () => this.alerts.success('Learning outcome deleted'),
             error: () => this.alerts.error('Failed to delete learning outcome. Please try again.'),
           });
-        this.alerts.success('Outcome deleted');
       },
     );
   }
@@ -301,10 +315,12 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   public createLearningOutcome() {
     const learningOutcome = new LearningOutcome();
 
-    learningOutcome.iloNumber = 1;
-    learningOutcome.abbreviation = '';
-    learningOutcome.name = '';
-    learningOutcome.description = '';
+    if (this.context instanceof TaskDefinition) learningOutcome.contextType = 'TaskDefinition';
+    else if (this.context instanceof Unit) learningOutcome.contextType = 'Unit';
+    learningOutcome.contextId = this.context.id;
+    learningOutcome.abbreviation = this.abbreviationPrefix;
+    learningOutcome.shortDescription = '';
+    learningOutcome.fullOutcomeDescription = '';
 
     this.selectedOutcome = learningOutcome;
   }
@@ -312,7 +328,7 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   public createFeedbackTemplate() {
     const feedbackTemplate = new FeedbackTemplate(this.context);
 
-    feedbackTemplate.id = 0;
+    feedbackTemplate.type = 'Feedback';
     feedbackTemplate.chipText = '';
     feedbackTemplate.description = '';
     feedbackTemplate.commentText = '';
@@ -322,15 +338,15 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
   }
 
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
-  readonly currentConnectedOutcome = model('');
-  readonly connectedOutcomes = signal([]);
-  readonly allOutcomes: string[] = ['TLO1', 'TLO2', 'TLO3', 'ULO1', 'ULO2'];
+  readonly typedConnectedOutcome = model('');
+  readonly selectedConnectedOutcomes = signal([]);
   readonly filteredOutcomes = computed(() => {
-    const currentOutcome = this.currentConnectedOutcome().toLowerCase();
+    const currentOutcome = this.typedConnectedOutcome().toLowerCase();
     return this.allOutcomes.filter((outcome) => {
+      const abbreviation = outcome.abbreviation?.toLowerCase();
       return (
-        !this.connectedOutcomes().includes(outcome) &&
-        (!currentOutcome || outcome.toLowerCase().includes(currentOutcome))
+        !this.selectedConnectedOutcomes().includes(outcome) &&
+        (!currentOutcome || abbreviation?.includes(currentOutcome))
       );
     });
   });
@@ -341,31 +357,41 @@ export class FeedbackTemplateEditorComponent implements AfterViewInit {
     const value = (event.value || '').trim();
 
     if (value) {
-      this.connectedOutcomes.update((connectedOutcomes) => [...connectedOutcomes, value]);
+      const outcome = this.allOutcomes.find(
+        (o) => o.abbreviation?.toLowerCase() === value.toLowerCase(),
+      );
+      if (outcome && !this.selectedConnectedOutcomes().includes(outcome)) {
+        this.selectedConnectedOutcomes.update((selectedConnectedOutcomes) => [
+          ...selectedConnectedOutcomes,
+          outcome,
+        ]);
+      }
     }
 
-    this.currentConnectedOutcome.set('');
+    this.typedConnectedOutcome.set('');
   }
 
-  remove(outcome: string): void {
-    this.connectedOutcomes.update((connectedOutcomes) => {
-      const index = connectedOutcomes.indexOf(outcome);
-      if (index < 0) {
-        return connectedOutcomes;
-      }
-
-      connectedOutcomes.splice(index, 1);
-      this.announcer.announce(`Removed ${outcome}`);
-      return [...connectedOutcomes];
+  remove(outcome: LearningOutcome): void {
+    this.selectedConnectedOutcomes.update((selectedConnectedOutcomes) => {
+      const updatedOutcomes = selectedConnectedOutcomes.filter(
+        (o) => o.abbreviation !== outcome.abbreviation,
+      );
+      this.announcer.announce(`Removed ${outcome.abbreviation}`);
+      return updatedOutcomes;
     });
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.connectedOutcomes.update((connectedOutcomes) => [
-      ...connectedOutcomes,
-      event.option.viewValue,
-    ]);
-    this.currentConnectedOutcome.set('');
+    const outcome = this.allOutcomes.find((o) => o.abbreviation === event.option.viewValue);
+
+    if (outcome && !this.selectedConnectedOutcomes().includes(outcome)) {
+      this.selectedConnectedOutcomes.update((selectedConnectedOutcomes) => [
+        ...selectedConnectedOutcomes,
+        outcome,
+      ]);
+    }
+
+    this.typedConnectedOutcome.set('');
     event.option.deselect();
   }
 }

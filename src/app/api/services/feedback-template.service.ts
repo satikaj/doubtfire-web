@@ -14,11 +14,14 @@ export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplat
 
     this.mapping.addKeys(
       'id',
-      'learningOutcome',
+      'type',
       'chipText',
       'description',
       'commentText',
       'summaryText',
+      'task_status_id',
+      'parent_chip_id',
+      'learning_outcome_id',
     );
   }
 
