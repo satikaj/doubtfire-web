@@ -7,7 +7,6 @@ export class LearningOutcome extends Entity {
   id: number;
   contextType: string;
   contextId: number;
-  iloNumber: number;
   abbreviation: string;
   shortDescription: string;
   fullOutcomeDescription: string;
