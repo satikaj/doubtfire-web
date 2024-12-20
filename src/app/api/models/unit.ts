@@ -93,6 +93,12 @@ export class Unit extends Entity {
     };
   }
 
+  public hasChanges(): boolean {
+    const unitService = AppInjector.get(UnitService);
+    const changes = this.toJson(unitService.mapping);
+    return JSON.stringify(changes) !== '{"unit":{}}';
+  }
+
   public get nameAndPeriod(): string {
     return `${this.name} (${
       this.teachingPeriod ? this.teachingPeriod.name : this.startDate.toLocaleDateString()
