@@ -47,6 +47,7 @@ import {AlertComponent} from 'src/app/common/services/alert.service';
 import {setTheme} from 'ngx-bootstrap/utils';
 
 import {AboutDoubtfireModalService} from 'src/app/common/modals/about-doubtfire-modal/about-doubtfire-modal.service';
+import { D2lUnitDetailsFormComponent, D2lUnitDetailsModal } from './units/states/edit/directives/unit-details-editor/d2l-details-form/d2l-unit-details-form.component';
 import {
   AboutDoubtfireModal,
   AboutDoubtfireModalContent,
@@ -159,6 +160,7 @@ import {
   WebcalService,
   LearningOutcomeService,
   TaskSimilarityService,
+  D2lAssessmentMappingService,
 } from './api/models/doubtfire-model';
 import {FileDownloaderService} from './common/file-downloader/file-downloader.service';
 import {PdfImageCommentComponent} from './tasks/task-comments-viewer/pdf-image-comment/pdf-image-comment.component';
@@ -256,6 +258,7 @@ const MY_DATE_FORMAT = {
   declarations: [
     AlertComponent,
     AboutDoubtfireModalContent,
+    D2lUnitDetailsFormComponent,
     TeachingPeriodUnitImportDialogComponent,
     TaskCommentComposerComponent,
     AudioCommentRecorderComponent,
@@ -367,6 +370,7 @@ const MY_DATE_FORMAT = {
     GroupSetService,
     GroupService,
     UnitService,
+    D2lAssessmentMappingService,
     ProjectService,
     UnitRoleService,
     LearningOutcomeService,
@@ -429,6 +433,7 @@ const MY_DATE_FORMAT = {
     TasksInTutorialsPipe,
     TasksForInboxSearchPipe,
     IsActiveUnitRole,
+    D2lUnitDetailsModal,
     CreateNewUnitModal,
     ScormAdapterService,
     TestAttemptService,
