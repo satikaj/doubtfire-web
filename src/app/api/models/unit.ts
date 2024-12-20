@@ -22,9 +22,11 @@ import {
   Project,
   TutorialStreamService,
   UnitRoleService,
+  D2lAssessmentMappingService,
 } from './doubtfire-model';
 import {LearningOutcome} from './learning-outcome';
 import {AlertService} from 'src/app/common/services/alert.service';
+import { D2lAssessmentMapping } from './d2l/d2l_assessment_mapping';
 
 export class Unit extends Entity {
   id: number;
@@ -62,6 +64,8 @@ export class Unit extends Entity {
   allowStudentExtensionRequests: boolean;
   extensionWeeksOnResubmitRequest: number;
   allowStudentChangeTutorial: boolean;
+
+  d2lMapping: D2lAssessmentMapping;
 
   public readonly learningOutcomesCache: EntityCache<LearningOutcome> =
     new EntityCache<LearningOutcome>();
@@ -551,6 +555,20 @@ export class Unit extends Entity {
     AppInjector.get(FileDownloaderService).downloadFile(
       `${AppInjector.get(DoubtfireConstants).API_URL}/csv/units/${this.id}/tutor_assessments.json`,
       `${this.name}-tutor-assessments.csv`,
+    );
+  }
+
+  public hasD2lMapping(): boolean {
+    return this.d2lMapping !== undefined && this.d2lMapping.orgUnitId.length > 0;
+  }
+
+  public loadD2lMapping(): Observable<D2lAssessmentMapping> {
+    const d2lMappingSvc = AppInjector.get(D2lAssessmentMappingService);
+
+    return d2lMappingSvc.get({unitId: this.id}).pipe(
+      tap((mappings) => {
+        this.d2lMapping = mappings;
+      }),
     );
   }
 }

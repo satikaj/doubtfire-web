@@ -27,7 +27,7 @@ export class D2lUnitDetailsFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.d2lAssessmentMappingService.get({unitId: this.data.id}).subscribe({
+    this.data.loadD2lMapping().subscribe({
       next: (d2lDataMapping) => {
         this.d2lDataMapping = d2lDataMapping;
       },
@@ -94,6 +94,7 @@ export class D2lUnitDetailsFormComponent implements OnInit {
       .subscribe({
         next: () => {
           this.alertService.success('D2l details deleted successfully');
+          this.data.d2lMapping = undefined;
           this.dialogRef.close();
         },
         error: (err) => {

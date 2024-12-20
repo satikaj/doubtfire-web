@@ -1,0 +1,36 @@
+<mat-dialog-content class="mat-typography">
+  <div class="modal-header">
+    <h1>D2L Grade Transfer</h1>
+  </div>
+  <div class="modal-body">
+    <p>Make sure that all student grades are ready to be transferred. Then run the following actions in oder.</p>
+
+    <p><strong>1. Login to D2L</strong>. This will open a new window.</p>
+    <p>
+      <button mat-icon-button color="primary" (click)="openD2l()">
+        <mat-icon>open_in_new</mat-icon>
+      </button>
+    </p>
+    <p><strong>2. Begin Grade Transfer</strong></p>
+    <p>
+      <button mat-icon-button color="primary" (click)="startTransfer()">
+        <mat-icon>start</mat-icon>
+      </button>
+    </p>
+    <p><strong>3. Wait for Email</strong></p>
+    <p>Once the transfer is complete, you will receive an email with the results.</p>
+    <p><strong>4. Download record</strong></p>
+    <p>
+      Once the transfer is complete, you can download the record of the transfer. This will show you any errors that may have occurred.
+    </p>
+    <p>
+      <button mat-icon-button color="primary" (click)="downloadRecord()">
+        <mat-icon>download</mat-icon>
+      </button>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions>
