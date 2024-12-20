@@ -35,7 +35,11 @@ export class HttpErrorInterceptor implements HttpInterceptor {
           errorMessage = error.statusText;
         } else {
           // server-side error
-          errorMessage = error.error.error;
+          if (error.error.error) {
+            errorMessage = error.error.error;
+          } else {
+            errorMessage = error.error;
+          }
           logMessage = `Error Code: ${error.status}`;
         }
 
