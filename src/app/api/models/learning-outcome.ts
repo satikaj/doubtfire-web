@@ -10,6 +10,7 @@ export class LearningOutcome extends Entity {
   abbreviation: string;
   shortDescription: string;
   fullOutcomeDescription: string;
+  linkedOutcomeIds: number[] = [];
 
   contextTypePaths = {
     'Unit': 'units',

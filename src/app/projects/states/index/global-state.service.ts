@@ -5,6 +5,7 @@ import {EntityCache} from 'ngx-entity-service';
 import {BehaviorSubject, Observable, Subject, skip, take} from 'rxjs';
 import {
   CampusService,
+  LearningOutcomeService,
   Project,
   ProjectService,
   TeachingPeriodService,
@@ -106,6 +107,7 @@ export class GlobalStateService implements OnDestroy {
     private projectService: ProjectService,
     private campusService: CampusService,
     private teachingPeriodService: TeachingPeriodService,
+    private learningOutcomeService: LearningOutcomeService,
     @Inject(UIRouter) private router: UIRouter,
     private alerts: AlertService,
     private mediaObserver: MediaObserver,
@@ -219,13 +221,24 @@ export class GlobalStateService implements OnDestroy {
     const loadingObserver = new Observable((subscriber) => {
       // Loading campuses
       this.campusService.query().subscribe({
-        next: (_reponse) => {
+        next: (_response) => {
           subscriber.next(true);
         },
         error: (_response) => {
           this.alerts.error('Unable to access service. Failed loading campuses.', 6000);
         },
       });
+
+      this.learningOutcomeService
+        .query({}, {endpointFormat: LearningOutcomeService.globalEndpoint})
+        .subscribe({
+          next: (_response) => {
+            subscriber.next(true);
+          },
+          error: (_response) => {
+            this.alerts.error('Unable to access service. Failed loading GLOs.', 6000);
+          },
+        });
 
       // Loading teaching periods
       this.teachingPeriodService.query().subscribe({

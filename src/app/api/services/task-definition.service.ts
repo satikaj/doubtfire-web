@@ -6,7 +6,6 @@ import API_URL from 'src/app/config/constants/apiURL';
 import { MappingFunctions } from './mapping-fn';
 import { AppInjector } from 'src/app/app-injector';
 import { Observable } from 'rxjs';
-import { FeedbackTemplateService } from './feedback-template.service';
 
 @Injectable()
 export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
@@ -15,7 +14,6 @@ export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
   constructor(
     httpClient: HttpClient,
     private learningOutcomeService: LearningOutcomeService,
-    private feedbackTemplateService: FeedbackTemplateService,
   ) {
     super(httpClient, API_URL);
 
@@ -122,18 +120,6 @@ export class TaskDefinitionService extends CachedEntityService<TaskDefinition> {
               ilo['id'],
               this.learningOutcomeService,
               ilo,
-            );
-          });
-        },
-      },
-      {
-        keys: 'feedbackTemplates',
-        toEntityOp: (data: object, key: string, taskDefinition: TaskDefinition) => {
-          data[key]?.forEach((template) => {
-            taskDefinition.feedbackTemplateCache.getOrCreate(
-              template['id'],
-              this.feedbackTemplateService,
-              template,
             );
           });
         },

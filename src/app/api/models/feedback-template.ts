@@ -12,8 +12,8 @@ export class FeedbackTemplate extends Entity {
   commentText: string;
   summaryText: string;
   taskStatus: 'fix_and_resubmit' | 'discuss' | 'redo' | 'complete' | 'feedback_exceeded';
-  parent: number;
-  learningOutcome: number;
+  parentChipId: number;
+  learningOutcomeId: number;
 
   readonly context: TaskDefinition | Unit;
 

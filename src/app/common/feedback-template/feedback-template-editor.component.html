@@ -44,7 +44,9 @@
         *matCellDef="let learningOutcome"
         (click)="selectLearningOutcome(learningOutcome)"
       >
-
+        @for (outcome of getLinkedOutcomes(learningOutcome); track outcome.abbreviation) {
+          <mat-chip-row>{{ outcome.abbreviation }}</mat-chip-row>
+        }
       </td>
     </ng-container>
     <ng-container matColumnDef="learningOutcomeAction" sticky>
@@ -59,7 +61,7 @@
             mat-icon-button
             aria-label="save learning outcome"
             color="primary"
-            (click)="saveLearningOutcome(learningOutcome)"
+            (click)="saveLearningOutcome()"
           >
             <mat-icon>save</mat-icon>
           </button>
@@ -132,7 +134,8 @@
 
         <mat-form-field appearance="outline" class="flex flex-grow">
           <mat-label>Full Outcome Description</mat-label>
-          <textarea matInput required [(ngModel)]="selectedOutcome.fullOutcomeDescription"> </textarea>
+          <textarea matInput required [(ngModel)]="selectedOutcome.fullOutcomeDescription">
+          </textarea>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="flex flex-grow">
@@ -166,7 +169,9 @@
 
         <div class="flex">
           <span class="flex-grow"></span>
-          <button mat-raised-button color="primary" (click)="saveLearningOutcome(selectedOutcome)">Save Outcome</button>
+          <button mat-raised-button color="primary" (click)="saveLearningOutcome(selectedOutcome)">
+            Save Outcome
+          </button>
         </div>
       </div>
     </div>
@@ -190,7 +195,7 @@
                 *matCellDef="let feedbackTemplate"
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
-                {{ feedbackTemplate.parent }}
+                {{ feedbackTemplate.parentId }}
               </td>
             </ng-container>
             <ng-container matColumnDef="chipText" sticky>
@@ -255,7 +260,7 @@
                     mat-icon-button
                     aria-label="save feedback template"
                     color="primary"
-                    (click)="saveFeedbackTemplate(feedbackTemplate)"
+                    (click)="saveFeedbackTemplate()"
                   >
                     <mat-icon>save</mat-icon>
                   </button>
@@ -327,8 +332,7 @@
 
                 <mat-form-field appearance="outline" class="basis-1/5">
                   <mat-label>Parent</mat-label>
-                  <mat-select required [(ngModel)]="selectedTemplate.parent">
-                  </mat-select>
+                  <mat-select required [(ngModel)]="selectedTemplate.parent"> </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="basis-1/5">

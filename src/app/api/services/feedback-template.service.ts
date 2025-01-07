@@ -7,7 +7,7 @@ import {TaskDefinition, Unit} from '../models/doubtfire-model';
 
 @Injectable()
 export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplate> {
-  protected readonly endpointFormat = 'feedback_templates/';
+  protected readonly endpointFormat = 'feedback_template_chips/context/:contextType:/:contextId:';
 
   constructor(httpClient: HttpClient) {
     super(httpClient, API_URL);
@@ -19,9 +19,9 @@ export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplat
       'description',
       'commentText',
       'summaryText',
-      'task_status_id',
-      'parent_chip_id',
-      'learning_outcome_id',
+      'taskStatusId',
+      'parentChipId',
+      'learningOutcomeId',
     );
   }
 

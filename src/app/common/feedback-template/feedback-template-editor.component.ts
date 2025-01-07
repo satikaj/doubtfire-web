@@ -58,6 +58,9 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   public selectedOutcome: LearningOutcome;
   public abbreviationPrefix: 'TLO' | 'ULO' | 'GLO';
 
+  public allOutcomes: LearningOutcome[] = [];
+  public selectedConnectedOutcomes = signal([]);
+
   @ViewChild('templateTable', {static: false}) templateTable: MatTable<FeedbackTemplate>;
   @ViewChild(MatSort, {static: false}) templateSort: MatSort;
   @ViewChild('templatePaginator', {static: false}) templatePaginator: MatPaginator;
@@ -75,7 +78,6 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   public selectedTemplate: FeedbackTemplate;
 
   private subscriptions: Subscription[] = [];
-  public allOutcomes: LearningOutcome[] = [];
 
   constructor(
     private alerts: AlertService,
@@ -108,22 +110,8 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
           );
         };
       }),
-      this.context.feedbackTemplateCache.values.subscribe((feedbackTemplates) => {
-        this.templateSource = new MatTableDataSource<FeedbackTemplate>(feedbackTemplates);
-        this.templateSource.paginator = this.templatePaginator;
-        this.templateSource.sort = this.templateSort;
-        this.templateSource.filterPredicate = (data: FeedbackTemplate, filter: string) => {
-          const filterValue = filter.trim().toLowerCase();
-          return (
-            data.id.toString().includes(filterValue) ||
-            data.chipText.toLowerCase().includes(filterValue) ||
-            data.commentText.toLowerCase().includes(filterValue) ||
-            data.summaryText.toLowerCase().includes(filterValue) ||
-            data.description.toLowerCase().includes(filterValue)
-          );
-        };
-      }),
-      this.learningOutcomeService.globalOutcomes().subscribe((glos) => {
+      this.learningOutcomeService.cache.values.subscribe((outcomes) => {
+        const glos = outcomes.filter((outcome) => outcome.contextType === null);
         this.allOutcomes = [...this.allOutcomes, ...glos];
       }),
     );
@@ -141,25 +129,49 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     this.subscriptions.forEach((s) => s.unsubscribe());
   }
 
-  public saveLearningOutcome(learningOutcome: LearningOutcome) {
-    learningOutcome.save().subscribe(() => {
-      this.alerts.success('Outcome saved');
-      learningOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+  public getFeedbackChips() {
+    this.context.feedbackTemplateCache.values.subscribe((feedbackTemplates) => {
+      this.templateSource = new MatTableDataSource<FeedbackTemplate>(feedbackTemplates);
+      this.templateSource.paginator = this.templatePaginator;
+      this.templateSource.sort = this.templateSort;
+      this.templateSource.filterPredicate = (data: FeedbackTemplate, filter: string) => {
+        const filterValue = filter.trim().toLowerCase();
+        return (
+          data.id.toString().includes(filterValue) ||
+          data.chipText.toLowerCase().includes(filterValue) ||
+          data.commentText.toLowerCase().includes(filterValue) ||
+          data.summaryText.toLowerCase().includes(filterValue) ||
+          data.description.toLowerCase().includes(filterValue)
+        );
+      };
     });
   }
 
-  public saveFeedbackTemplate(feedbackTemplate: FeedbackTemplate) {
-    feedbackTemplate.save().subscribe(() => {
+  public saveLearningOutcome() {
+    for (const outcome of this.selectedConnectedOutcomes()) {
+      this.selectedOutcome.linkedOutcomeIds.push(outcome.id);
+    }
+    this.selectedOutcome.save().subscribe(() => {
+      this.alerts.success('Outcome saved');
+      this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+    });
+  }
+
+  public saveFeedbackTemplate() {
+    this.selectedTemplate.save().subscribe(() => {
       this.alerts.success('Template saved');
-      feedbackTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
+      this.selectedTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
     });
   }
 
   public selectLearningOutcome(learningOutcome: LearningOutcome) {
     if (this.selectedOutcome === learningOutcome) {
       this.selectedOutcome = null;
+      this.selectedConnectedOutcomes.update((_selectedConnectedOutcomes) => []);
     } else {
       this.selectedOutcome = learningOutcome;
+      this.selectedConnectedOutcomes.update(() => this.getLinkedOutcomes(learningOutcome));
+      this.getFeedbackChips();
     }
   }
 
@@ -339,7 +351,6 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
 
   readonly separatorKeysCodes: number[] = [ENTER, COMMA];
   readonly typedConnectedOutcome = model('');
-  readonly selectedConnectedOutcomes = signal([]);
   readonly filteredOutcomes = computed(() => {
     const currentOutcome = this.typedConnectedOutcome().toLowerCase();
     return this.allOutcomes.filter((outcome) => {
@@ -393,5 +404,11 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
 
     this.typedConnectedOutcome.set('');
     event.option.deselect();
+  }
+
+  getLinkedOutcomes(learningOutcome: LearningOutcome): LearningOutcome[] {
+    return this.allOutcomes.filter((outcome) =>
+      learningOutcome.linkedOutcomeIds.includes(outcome.id),
+    );
   }
 }
