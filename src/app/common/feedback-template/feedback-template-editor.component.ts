@@ -340,7 +340,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   public createFeedbackTemplate() {
     const feedbackTemplate = new FeedbackTemplate(this.context);
 
-    feedbackTemplate.type = 'Feedback';
+    feedbackTemplate.type = 'Template';
     feedbackTemplate.chipText = '';
     feedbackTemplate.description = '';
     feedbackTemplate.commentText = '';

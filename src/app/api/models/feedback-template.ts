@@ -6,7 +6,7 @@ import {FeedbackTemplateService} from '../services/feedback-template.service';
 
 export class FeedbackTemplate extends Entity {
   id: number;
-  type: 'Group' | 'Feedback';
+  type: 'Group' | 'Template';
   chipText: string;
   description: string;
   commentText: string;

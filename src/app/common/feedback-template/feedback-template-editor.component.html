@@ -326,7 +326,7 @@
                   <mat-label>Type</mat-label>
                   <mat-select required [(ngModel)]="selectedTemplate.type">
                     <mat-option [value]="'Group'">Group</mat-option>
-                    <mat-option [value]="'Feedback'">Feedback</mat-option>
+                    <mat-option [value]="'Template'">Template</mat-option>
                   </mat-select>
                 </mat-form-field>
 
@@ -357,7 +357,7 @@
                   />
                 </mat-form-field>
               </div>
-              @if (selectedTemplate.type === 'Feedback') {
+              @if (selectedTemplate.type === 'Template') {
                 <mat-form-field appearance="outline" class="flex flex-grow">
                   <mat-label>Comment Text</mat-label>
                   <textarea
