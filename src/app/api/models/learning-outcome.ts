@@ -14,7 +14,7 @@ export class LearningOutcome extends Entity {
 
   context?: TaskDefinition | Unit;
 
-  readonly contextTypePath = {
+  private readonly contextTypePath = {
     'Unit': 'units',
     'TaskDefinition': 'task_definitions',
     'Course': 'courses',

@@ -24,7 +24,7 @@ export class LearningOutcomeService extends CachedEntityService<LearningOutcome>
       'linkedOutcomeIds',
     );
 
-    this.mapping.mapAllKeysToJsonExcept('id');
+    this.mapping.mapAllKeysToJsonExcept('id', 'context');
   }
 
   public createInstanceFrom(json: object, other?: any): LearningOutcome {

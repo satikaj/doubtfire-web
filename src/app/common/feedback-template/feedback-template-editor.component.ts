@@ -166,8 +166,9 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   }
 
   public saveLearningOutcome() {
-    for (const outcome of this.selectedConnectedOutcomes()) {
-      this.selectedOutcome.linkedOutcomeIds.push(outcome.id);
+    const linkedOutcomes = this.selectedConnectedOutcomes();
+    if (linkedOutcomes.length > 0) {
+      this.selectedOutcome.linkedOutcomeIds = linkedOutcomes.map((outcome) => outcome.id);
     }
     this.selectedOutcome.save().subscribe({
       next: () => {

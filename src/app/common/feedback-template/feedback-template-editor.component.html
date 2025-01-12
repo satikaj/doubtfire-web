@@ -45,7 +45,9 @@
         (click)="selectLearningOutcome(learningOutcome)"
       >
         @for (outcome of getLinkedOutcomes(learningOutcome); track outcome.abbreviation) {
-          <mat-chip-row>{{ outcome.abbreviation }}</mat-chip-row>
+          <mat-chip-row matTooltip="{{ outcome.shortDescription }}">{{
+            outcome.abbreviation
+          }}</mat-chip-row>
         }
       </td>
     </ng-container>
