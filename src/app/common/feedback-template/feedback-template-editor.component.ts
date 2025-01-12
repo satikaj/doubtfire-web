@@ -414,7 +414,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     });
   }
 
-  selected(event: MatAutocompleteSelectedEvent): void {
+  select(event: MatAutocompleteSelectedEvent): void {
     const outcome = this.allOutcomes.find((o) => o.abbreviation === event.option.viewValue);
 
     if (outcome && !this.selectedConnectedOutcomes().includes(outcome)) {

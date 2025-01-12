@@ -79,11 +79,6 @@
       </td>
     </ng-container>
 
-    <!-- Action footer row -->
-    <ng-container matColumnDef="actions">
-      <td mat-footer-cell *matFooterCellDef [colSpan]="outcomeColumns.length"></td>
-    </ng-container>
-
     <tr mat-header-row *matHeaderRowDef="outcomeColumns"></tr>
     <tr
       mat-row
@@ -91,6 +86,7 @@
       [style.background]="selectedOutcome === row ? 'lightblue' : ''"
     ></tr>
   </table>
+
   <span class="flex items-center">
     <div class="h-20">
       <mat-form-field appearance="outline">
@@ -117,6 +113,7 @@
     <span class="flex-grow"></span>
     <button mat-raised-button color="primary" (click)="createLearningOutcome()">Add Outcome</button>
   </span>
+
   @if (selectedOutcome) {
     <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
       <div>
@@ -163,7 +160,7 @@
             (matChipInputTokenEnd)="add($event)"
             [disabled]="!this.context"
           />
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
             @for (outcome of filteredOutcomes(); track outcome) {
               <mat-option [value]="outcome.abbreviation">{{ outcome.abbreviation }}</mat-option>
             }
@@ -178,6 +175,7 @@
         </div>
       </div>
     </div>
+
     <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
       <div class="mb-1">
         <h4 class="font-bold text-2xl text-gray-900">Edit Feedback Templates for Outcome</h4>
@@ -279,11 +277,6 @@
               </td>
             </ng-container>
 
-            <!-- Action footer row -->
-            <ng-container matColumnDef="actions">
-              <td mat-footer-cell *matFooterCellDef [colSpan]="templateColumns.length"></td>
-            </ng-container>
-
             <tr mat-header-row *matHeaderRowDef="templateColumns"></tr>
             <tr
               mat-row
@@ -291,6 +284,7 @@
               [style.background]="selectedTemplate === row ? 'lightblue' : ''"
             ></tr>
           </table>
+
           <span class="flex items-center">
             <div class="h-20">
               <mat-form-field appearance="outline">
@@ -360,6 +354,7 @@
                   />
                 </mat-form-field>
               </div>
+
               @if (selectedTemplate.type === 'Template') {
                 <mat-form-field appearance="outline" class="flex flex-grow">
                   <mat-label>Comment Text</mat-label>
@@ -395,6 +390,7 @@
                   </mat-form-field>
                 </div>
               }
+
               <div class="flex">
                 <span class="flex-grow"></span>
                 <button mat-raised-button color="primary">Save Template</button>
