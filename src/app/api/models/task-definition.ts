@@ -185,7 +185,7 @@ export class TaskDefinition extends Entity {
 
   public getOutcomeBatchUploadUrl(): string {
     const constants = AppInjector.get(DoubtfireConstants);
-    return `${constants.API_URL}/units/${this.unit.id}/task_definitions/${this.id}/outcomes/csv`;
+    return `${constants.API_URL}/task_definitions/${this.id}/outcomes/csv`;
   }
 
   public getFeedbackTemplateBatchUploadUrl(): string {
