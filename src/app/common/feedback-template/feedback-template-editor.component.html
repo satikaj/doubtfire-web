@@ -159,6 +159,7 @@
             [matAutocomplete]="auto"
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
             (matChipInputTokenEnd)="add($event)"
+            [disabled]="!this.context"
           />
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
             @for (outcome of filteredOutcomes(); track outcome) {

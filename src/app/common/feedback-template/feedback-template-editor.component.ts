@@ -95,6 +95,26 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   }
 
   ngAfterViewInit(): void {
+    if (!this.context) {
+      this.subscriptions.push(
+        this.learningOutcomeService.cache.values.subscribe((outcomes) => {
+          const glos = outcomes.filter((outcome) => outcome.contextType === null);
+          this.outcomeSource = new MatTableDataSource<LearningOutcome>(glos);
+          this.outcomeSource.paginator = this.outcomePaginator;
+          this.outcomeSource.sort = this.outcomeSort;
+          this.outcomeSource.filterPredicate = (data: LearningOutcome, filter: string) => {
+            const filterValue = filter.trim().toLowerCase();
+            return (
+              data.abbreviation.toLowerCase().includes(filterValue) ||
+              data.shortDescription.toLowerCase().includes(filterValue) ||
+              data.fullOutcomeDescription.toLowerCase().includes(filterValue)
+            );
+          };
+        }),
+      );
+      return;
+    }
+
     this.subscriptions.push(
       this.context.learningOutcomesCache.values.subscribe((learningOutcomes) => {
         this.outcomeSource = new MatTableDataSource<LearningOutcome>(learningOutcomes);
