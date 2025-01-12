@@ -1,7 +1,7 @@
 import {Entity, EntityMapping} from 'ngx-entity-service';
 import {Observable} from 'rxjs';
 import {AppInjector} from 'src/app/app-injector';
-import {LearningOutcomeService} from './doubtfire-model';
+import {LearningOutcomeService, TaskDefinition, Unit} from './doubtfire-model';
 
 export class LearningOutcome extends Entity {
   id: number;
@@ -12,7 +12,9 @@ export class LearningOutcome extends Entity {
   fullOutcomeDescription: string;
   linkedOutcomeIds: number[] = [];
 
-  contextTypePaths = {
+  context?: TaskDefinition | Unit;
+
+  readonly contextTypePath = {
     'Unit': 'units',
     'TaskDefinition': 'task_definitions',
     'Course': 'courses',
@@ -21,23 +23,51 @@ export class LearningOutcome extends Entity {
   public save(): Observable<LearningOutcome> {
     const svc = AppInjector.get(LearningOutcomeService);
 
-    if (this.isNew) {
-      return svc.create(
-        {
-          contextType: this.contextTypePaths[this.contextType],
-          contextId: this.contextId,
-        },
-        {entity: this},
-      );
+    if (this.context) {
+      if (this.isNew) {
+        return svc.create(
+          {
+            contextType: this.contextTypePath[this.contextType],
+            contextId: this.contextId,
+          },
+          {
+            entity: this,
+            cache: this.context.learningOutcomesCache,
+          },
+        );
+      } else {
+        return svc.update(
+          {
+            contextType: this.contextTypePath[this.contextType],
+            contextId: this.contextId,
+            id: this.id,
+          },
+          {
+            entity: this,
+            cache: this.context.learningOutcomesCache,
+            endpointFormat: LearningOutcomeService.updateEndpoint,
+          },
+        );
+      }
     } else {
-      return svc.update(
-        {
-          contextType: this.contextTypePaths[this.contextType],
-          contextId: this.contextId,
-          id: this.id,
-        },
-        {entity: this, endpointFormat: LearningOutcomeService.updateEndpoint},
-      );
+      // GLO
+      if (this.isNew) {
+        return svc.create(
+          {},
+          {entity: this, cache: svc.cache, endpointFormat: LearningOutcomeService.globalEndpoint},
+        );
+      } else {
+        return svc.update(
+          {
+            id: this.id,
+          },
+          {
+            entity: this,
+            cache: svc.cache,
+            endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
+          },
+        );
+      }
     }
   }
 
@@ -68,5 +98,36 @@ export class LearningOutcome extends Entity {
 
   public get isNew(): boolean {
     return !this.id;
+  }
+
+  public delete(): Observable<unknown> {
+    const svc = AppInjector.get(LearningOutcomeService);
+
+    if (this.context) {
+      return svc.delete(
+        {
+          contextType: this.contextTypePath[this.contextType],
+          contextId: this.contextId,
+          id: this.id,
+        },
+        {
+          entity: this,
+          cache: this.context.learningOutcomesCache,
+          endpointFormat: LearningOutcomeService.updateEndpoint,
+        },
+      );
+    } else {
+      // GLO
+      return svc.delete(
+        {
+          id: this.id,
+        },
+        {
+          entity: this,
+          cache: svc.cache,
+          endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
+        },
+      );
+    }
   }
 }

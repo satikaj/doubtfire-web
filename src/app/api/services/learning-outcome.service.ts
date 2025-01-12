@@ -9,6 +9,7 @@ export class LearningOutcomeService extends CachedEntityService<LearningOutcome>
   protected readonly endpointFormat = ':contextType:/:contextId:/outcomes';
   public static updateEndpoint = ':contextType:/:contextId:/outcomes/:id:';
   public static globalEndpoint = 'global/outcomes';
+  public static updateGlobalEndpoint = 'global/outcomes/:id:';
 
   constructor(httpClient: HttpClient) {
     super(httpClient, API_URL);

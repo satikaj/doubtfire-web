@@ -20,7 +20,6 @@ import {
   LearningOutcomeService,
   FeedbackTemplate,
 } from 'src/app/api/models/doubtfire-model';
-import {TaskDefinitionService} from 'src/app/api/services/task-definition.service';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {MatSort, Sort} from '@angular/material/sort';
 import {
@@ -41,7 +40,7 @@ import {FileDownloaderService} from '../file-downloader/file-downloader.service'
   templateUrl: 'feedback-template-editor.component.html',
 })
 export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() context: TaskDefinition | Unit;
+  @Input() context?: TaskDefinition | Unit;
 
   @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
   @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
@@ -81,7 +80,6 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
 
   constructor(
     private alerts: AlertService,
-    private taskDefinitionService: TaskDefinitionService,
     private learningOutcomeService: LearningOutcomeService,
     private feedbackTemplateService: FeedbackTemplateService,
     private fileDownloaderService: FileDownloaderService,
@@ -91,7 +89,8 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   ) {}
 
   ngOnInit(): void {
-    if (this.context instanceof TaskDefinition) this.abbreviationPrefix = 'TLO';
+    if (!this.context) this.abbreviationPrefix = 'GLO';
+    else if (this.context instanceof TaskDefinition) this.abbreviationPrefix = 'TLO';
     else if (this.context instanceof Unit) this.abbreviationPrefix = 'ULO';
   }
 
@@ -137,7 +136,6 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
       this.templateSource.filterPredicate = (data: FeedbackTemplate, filter: string) => {
         const filterValue = filter.trim().toLowerCase();
         return (
-          data.id.toString().includes(filterValue) ||
           data.chipText.toLowerCase().includes(filterValue) ||
           data.commentText.toLowerCase().includes(filterValue) ||
           data.summaryText.toLowerCase().includes(filterValue) ||
@@ -151,16 +149,22 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     for (const outcome of this.selectedConnectedOutcomes()) {
       this.selectedOutcome.linkedOutcomeIds.push(outcome.id);
     }
-    this.selectedOutcome.save().subscribe(() => {
-      this.alerts.success('Outcome saved');
-      this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+    this.selectedOutcome.save().subscribe({
+      next: () => {
+        this.alerts.success('Outcome saved');
+        this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+      },
+      error: () => this.alerts.error('Failed to save learning outcome. Please try again.'),
     });
   }
 
   public saveFeedbackTemplate() {
-    this.selectedTemplate.save().subscribe(() => {
-      this.alerts.success('Template saved');
-      this.selectedTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
+    this.selectedTemplate.save().subscribe({
+      next: () => {
+        this.alerts.success('Template saved');
+        this.selectedTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
+      },
+      error: () => this.alerts.error('Failed to save feedback template. Please try again.'),
     });
   }
 
@@ -171,6 +175,12 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     } else {
       this.selectedOutcome = learningOutcome;
       this.selectedConnectedOutcomes.update(() => this.getLinkedOutcomes(learningOutcome));
+      if (!this.selectedOutcome.context) this.selectedOutcome.context = this.context;
+
+      if (!this.selectedOutcome.hasOriginalSaveData) {
+        this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+      }
+
       this.getFeedbackChips();
     }
   }
@@ -260,23 +270,10 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
       'Delete learning outcome',
       'Are you sure you want to delete this outcome? This action is final.',
       () => {
-        this.learningOutcomeService
-          .delete(
-            {
-              contextType: learningOutcome.contextTypePaths[learningOutcome.contextType],
-              contextId: learningOutcome.contextId,
-              id: learningOutcome.id,
-            },
-            {
-              entity: learningOutcome,
-              cache: this.context.learningOutcomesCache,
-              endpointFormat: LearningOutcomeService.updateEndpoint,
-            },
-          )
-          .subscribe({
-            next: () => this.alerts.success('Learning outcome deleted'),
-            error: () => this.alerts.error('Failed to delete learning outcome. Please try again.'),
-          });
+        learningOutcome.delete().subscribe({
+          next: () => this.alerts.success('Learning outcome deleted'),
+          error: () => this.alerts.error('Failed to delete learning outcome. Please try again.'),
+        });
       },
     );
   }
@@ -327,9 +324,13 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   public createLearningOutcome() {
     const learningOutcome = new LearningOutcome();
 
-    if (this.context instanceof TaskDefinition) learningOutcome.contextType = 'TaskDefinition';
-    else if (this.context instanceof Unit) learningOutcome.contextType = 'Unit';
-    learningOutcome.contextId = this.context.id;
+    learningOutcome.context = this.context;
+
+    if (this.context) {
+      if (this.context instanceof TaskDefinition) learningOutcome.contextType = 'TaskDefinition';
+      else if (this.context instanceof Unit) learningOutcome.contextType = 'Unit';
+      learningOutcome.contextId = this.context.id;
+    }
     learningOutcome.abbreviation = this.abbreviationPrefix;
     learningOutcome.shortDescription = '';
     learningOutcome.fullOutcomeDescription = '';
