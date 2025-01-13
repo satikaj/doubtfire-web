@@ -1,15 +1,15 @@
 //
 // Modal to show Doubtfire version info
 //
-import { HttpClient } from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {Injectable, Component, Inject, OnInit} from '@angular/core';
 import {MatDialog, MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {D2lAssessmentMapping} from 'src/app/api/models/d2l/d2l_assessment_mapping';
 import {D2lAssessmentMappingService} from 'src/app/api/models/doubtfire-model';
 import {Unit} from 'src/app/api/models/unit';
-import { FileDownloaderService } from 'src/app/common/file-downloader/file-downloader.service';
+import {FileDownloaderService} from 'src/app/common/file-downloader/file-downloader.service';
 import {AlertService} from 'src/app/common/services/alert.service';
-import { DoubtfireConstants } from 'src/app/config/constants/doubtfire-constants';
+import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
 
 @Component({
   selector: 'f-d2l-transfer',
@@ -110,8 +110,27 @@ export class D2lTransferComponent implements OnInit {
   }
 
   public downloadRecord(): void {
-    const url = `${this.doubtfireConstants.API_URL}/units/${this.data.id}/d2l/grades`;
-    this.fileDownloader.downloadFile(url, `${this.data.code}-d2l-grades.csv`);
+    this.httpClient
+      .get<GradesAvailableResponse>(
+        `${this.doubtfireConstants.API_URL}/units/${this.data.id}/d2l/grades/available`,
+      )
+      .subscribe({
+        next: (response) => {
+          if (response.running) {
+            this.alertService.error('Transfer in progress, please wait');
+          } else if (response.available) {
+            const url = `${this.doubtfireConstants.API_URL}/units/${this.data.id}/d2l/grades`;
+            this.fileDownloader.downloadFile(url, `${this.data.code}-d2l-grades.csv`);
+          } else {
+            this.alertService.error(
+              'No grade transfer results are available, and grade transfer does not appear to be in progress',
+            );
+          }
+        },
+        error: (err) => {
+          this.alertService.error(`Failed to download record: ${err}`);
+        },
+      });
   }
 }
 
@@ -130,4 +149,9 @@ export class D2lTransferModal {
       data: unit,
     });
   }
+}
+
+interface GradesAvailableResponse {
+  available: boolean;
+  running: boolean;
 }
