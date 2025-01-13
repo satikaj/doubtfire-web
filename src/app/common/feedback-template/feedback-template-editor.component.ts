@@ -9,6 +9,7 @@ import {
   OnDestroy,
   OnInit,
   signal,
+  effect,
   ViewChild,
 } from '@angular/core';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
@@ -86,7 +87,12 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
-  ) {}
+  ) {
+    effect(() => {
+      const linkedOutcomes = this.selectedConnectedOutcomes();
+      this.selectedOutcome.linkedOutcomeIds = linkedOutcomes.map((outcome) => outcome.id);
+    });
+  }
 
   ngOnInit(): void {
     if (!this.context) this.abbreviationPrefix = 'GLO';
@@ -165,15 +171,11 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     });
   }
 
-  public saveLearningOutcome() {
-    const linkedOutcomes = this.selectedConnectedOutcomes();
-    if (linkedOutcomes.length > 0) {
-      this.selectedOutcome.linkedOutcomeIds = linkedOutcomes.map((outcome) => outcome.id);
-    }
-    this.selectedOutcome.save().subscribe({
+  public saveLearningOutcome(learningOutcome: LearningOutcome) {
+    learningOutcome.save().subscribe({
       next: () => {
         this.alerts.success('Outcome saved');
-        this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+        learningOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
       },
       error: () => this.alerts.error('Failed to save learning outcome. Please try again.'),
     });
