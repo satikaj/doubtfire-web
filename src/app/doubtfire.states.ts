@@ -9,6 +9,7 @@ import {AcceptEulaComponent} from './eula/accept-eula/accept-eula.component';
 import {FUsersComponent} from './admin/states/f-users/f-users.component';
 import {FUnitsComponent} from './admin/states/f-units/f-units.component';
 import {ScormPlayerComponent} from './common/scorm-player/scorm-player.component';
+import { SuccessCloseComponent } from './common/success-close/success-close.component';
 
 /*
  * Use this file to store any states that are sourced by angular components.
@@ -390,6 +391,21 @@ const ScormPlayerReviewState: NgHybridStateDeclaration = {
   },
 };
 
+const SuccessCloseState: NgHybridStateDeclaration = {
+  name: 'success-close',
+  url: '/success-close',
+  views: {
+    main: {
+      component: SuccessCloseComponent,
+    },
+  },
+  data: {
+    pageTitle: 'Home Page',
+    roleWhitelist: ['Student', 'Tutor', 'Convenor', 'Admin', 'Auditor'],
+  },
+};
+
+
 /**
  * Export the list of states we have created in angular
  */
@@ -408,4 +424,5 @@ export const doubtfireStates = [
   ScormPlayerNormalState,
   ScormPlayerReviewState,
   ScormPlayerStudentReviewState,
+  SuccessCloseState
 ];

@@ -563,6 +563,7 @@ export class Unit extends Entity {
     return (
       doubtfireConstants.IsD2LEnabled.value &&
       this.d2lMapping !== undefined &&
+      this.d2lMapping.orgUnitId !== undefined &&
       this.d2lMapping.orgUnitId.length > 0
     );
   }
