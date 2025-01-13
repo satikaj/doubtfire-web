@@ -35,6 +35,7 @@ import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {FileDownloaderService} from '../file-downloader/file-downloader.service';
+import {isEqual} from 'lodash';
 
 @Component({
   selector: 'f-feedback-template-editor',
@@ -89,8 +90,12 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     @Inject(confirmationModal) private confirmationModal: any,
   ) {
     effect(() => {
-      const linkedOutcomes = this.selectedConnectedOutcomes();
-      this.selectedOutcome.linkedOutcomeIds = linkedOutcomes.map((outcome) => outcome.id);
+      const linkedOutcomes = this.selectedConnectedOutcomes().map((outcome) => outcome.id);
+      if (
+        this.selectedOutcome &&
+        !isEqual(linkedOutcomes.sort(), this.selectedOutcome.linkedOutcomeIds.sort())
+      )
+        this.selectedOutcome.linkedOutcomeIds = linkedOutcomes;
     });
   }
 
