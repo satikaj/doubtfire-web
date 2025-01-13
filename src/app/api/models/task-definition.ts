@@ -3,7 +3,7 @@ import { Entity, EntityCache, EntityMapping } from 'ngx-entity-service';
 import { Observable, tap } from 'rxjs';
 import { AppInjector } from 'src/app/app-injector';
 import { DoubtfireConstants } from 'src/app/config/constants/doubtfire-constants';
-import { FeedbackTemplate, Grade, GroupSet, LearningOutcome, TutorialStream, Unit } from './doubtfire-model';
+import { Grade, GroupSet, LearningOutcome, TutorialStream, Unit } from './doubtfire-model';
 import { TaskDefinitionService } from '../services/task-definition.service';
 import { AlertService } from 'src/app/common/services/alert.service';
 
@@ -47,8 +47,6 @@ export class TaskDefinition extends Entity {
 
   public readonly learningOutcomesCache: EntityCache<LearningOutcome> =
     new EntityCache<LearningOutcome>();
-  public readonly feedbackTemplateCache: EntityCache<FeedbackTemplate> =
-    new EntityCache<FeedbackTemplate>();
 
   readonly unit: Unit;
 
@@ -186,11 +184,6 @@ export class TaskDefinition extends Entity {
   public getOutcomeBatchUploadUrl(): string {
     const constants = AppInjector.get(DoubtfireConstants);
     return `${constants.API_URL}/task_definitions/${this.id}/outcomes/csv`;
-  }
-
-  public getFeedbackTemplateBatchUploadUrl(): string {
-    const constants = AppInjector.get(DoubtfireConstants);
-    return `${constants.API_URL}/units/${this.unit.id}/task_definitions/${this.id}/feedback_templates/csv`;
   }
 
   /**

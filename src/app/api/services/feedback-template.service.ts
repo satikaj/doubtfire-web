@@ -3,11 +3,13 @@ import {CachedEntityService} from 'ngx-entity-service';
 import {FeedbackTemplate} from '../models/feedback-template';
 import {HttpClient} from '@angular/common/http';
 import API_URL from 'src/app/config/constants/apiURL';
-import {TaskDefinition, Unit} from '../models/doubtfire-model';
 
 @Injectable()
 export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplate> {
-  protected readonly endpointFormat = 'feedback_template_chips/context/:contextType:/:contextId:';
+  protected readonly endpointFormat = ':contextType:/:contextId:/feedback_chips';
+  public static addEndpoint = 'feedback_chips';
+  public static updateEndpoint = 'feedback_chips/:id:';
+  public static globalEndpoint = 'global/feedback_chips';
 
   constructor(httpClient: HttpClient) {
     super(httpClient, API_URL);
@@ -19,16 +21,15 @@ export class FeedbackTemplateService extends CachedEntityService<FeedbackTemplat
       'description',
       'commentText',
       'summaryText',
-      'taskStatusId',
+      'taskStatus',
       'parentChipId',
       'learningOutcomeId',
     );
+
+    this.mapping.mapAllKeysToJsonExcept('id');
   }
 
-  public override createInstanceFrom(
-    json: object,
-    other?: TaskDefinition | Unit,
-  ): FeedbackTemplate {
-    return new FeedbackTemplate(other);
+  public override createInstanceFrom(json: object, other?: any): FeedbackTemplate {
+    return new FeedbackTemplate();
   }
 }

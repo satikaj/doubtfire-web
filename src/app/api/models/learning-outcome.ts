@@ -2,6 +2,7 @@ import {Entity, EntityMapping} from 'ngx-entity-service';
 import {Observable} from 'rxjs';
 import {AppInjector} from 'src/app/app-injector';
 import {LearningOutcomeService, TaskDefinition, Unit} from './doubtfire-model';
+import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
 
 export class LearningOutcome extends Entity {
   id: number;
@@ -54,7 +55,7 @@ export class LearningOutcome extends Entity {
       if (this.isNew) {
         return svc.create(
           {},
-          {entity: this, cache: svc.cache, endpointFormat: LearningOutcomeService.globalEndpoint},
+          {entity: this, endpointFormat: LearningOutcomeService.globalEndpoint},
         );
       } else {
         return svc.update(
@@ -63,7 +64,6 @@ export class LearningOutcome extends Entity {
           },
           {
             entity: this,
-            cache: svc.cache,
             endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
           },
         );
@@ -124,10 +124,14 @@ export class LearningOutcome extends Entity {
         },
         {
           entity: this,
-          cache: svc.cache,
           endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
         },
       );
     }
+  }
+
+  public getFeedbackTemplateBatchUploadUrl(): string {
+    const constants = AppInjector.get(DoubtfireConstants);
+    return `${constants.API_URL}/${this.contextTypePath[this.contextType]}/${this.contextId}/outcomes/${this.id}/feedback_chips/csv`;
   }
 }

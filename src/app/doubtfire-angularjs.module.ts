@@ -226,6 +226,7 @@ import {AlertService} from './common/services/alert.service';
 import {GradeService} from './common/services/grade.service';
 import {TaskScormCardComponent} from './projects/states/dashboard/directives/task-dashboard/directives/task-scorm-card/task-scorm-card.component';
 import {FeedbackTemplateEditorComponent} from './common/feedback-template/feedback-template-editor.component';
+import {FeedbackTemplateService} from './api/services/feedback-template.service';
 
 export const DoubtfireAngularJSModule = angular.module('doubtfire', [
   'doubtfire.config',
@@ -304,6 +305,11 @@ DoubtfireAngularJSModule.factory(
   downgradeInjectable(EditProfileDialogService),
 );
 DoubtfireAngularJSModule.factory('CreateNewUnitModal', downgradeInjectable(CreateNewUnitModal));
+
+DoubtfireAngularJSModule.factory(
+  'FeedbackTemplateService',
+  downgradeInjectable(FeedbackTemplateService),
+);
 
 // directive -> component
 DoubtfireAngularJSModule.directive(

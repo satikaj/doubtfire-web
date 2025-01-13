@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
+import {MatSelectChange} from '@angular/material/select';
 import {
   TaskDefinition,
   Unit,
@@ -77,6 +78,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     'feedbackTemplateAction',
   ];
   public selectedTemplate: FeedbackTemplate;
+  public possibleParents: FeedbackTemplate[];
 
   private subscriptions: Subscription[] = [];
 
@@ -160,8 +162,12 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   }
 
   public getFeedbackChips() {
-    this.context.feedbackTemplateCache.values.subscribe((feedbackTemplates) => {
-      this.templateSource = new MatTableDataSource<FeedbackTemplate>(feedbackTemplates);
+    this.feedbackTemplateService.cache.values.subscribe((templates) => {
+      const outcomeTemplates = templates.filter(
+        (temp) => temp.learningOutcomeId === this.selectedOutcome.id,
+      );
+      this.possibleParents = outcomeTemplates.filter((temp) => temp.type === 'group');
+      this.templateSource = new MatTableDataSource<FeedbackTemplate>(outcomeTemplates);
       this.templateSource.paginator = this.templatePaginator;
       this.templateSource.sort = this.templateSort;
       this.templateSource.filterPredicate = (data: FeedbackTemplate, filter: string) => {
@@ -186,11 +192,11 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     });
   }
 
-  public saveFeedbackTemplate() {
-    this.selectedTemplate.save().subscribe({
+  public saveFeedbackTemplate(feedbackTemplate: FeedbackTemplate) {
+    feedbackTemplate.save().subscribe({
       next: () => {
         this.alerts.success('Template saved');
-        this.selectedTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
+        feedbackTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
       },
       error: () => this.alerts.error('Failed to save feedback template. Please try again.'),
     });
@@ -311,7 +317,10 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
       'Delete feedback template',
       'Are you sure you want to delete this template? This action is final.',
       () => {
-        this.alerts.success('Template deleted');
+        feedbackTemplate.delete().subscribe({
+          next: () => this.alerts.success('Feedback template deleted'),
+          error: () => this.alerts.error('Failed to delete feedback template. Please try again.'),
+        });
       },
     );
   }
@@ -320,7 +329,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     const url =
       type === 'Learning Outcomes'
         ? this.context.getOutcomeBatchUploadUrl()
-        : this.context.getFeedbackTemplateBatchUploadUrl();
+        : this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
 
     this.csvUploadModal.show(
       `Upload ${type} as CSV`,
@@ -344,7 +353,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     const url =
       type === 'learning-outcomes'
         ? this.context.getOutcomeBatchUploadUrl()
-        : this.context.getFeedbackTemplateBatchUploadUrl();
+        : this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
 
     this.fileDownloaderService.downloadFile(url, `${name}-${type}.csv`);
   }
@@ -367,13 +376,14 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   }
 
   public createFeedbackTemplate() {
-    const feedbackTemplate = new FeedbackTemplate(this.context);
+    const feedbackTemplate = new FeedbackTemplate();
 
-    feedbackTemplate.type = 'Template';
+    feedbackTemplate.type = 'template';
     feedbackTemplate.chipText = '';
     feedbackTemplate.description = '';
     feedbackTemplate.commentText = '';
     feedbackTemplate.summaryText = '';
+    feedbackTemplate.learningOutcomeId = this.selectedOutcome.id;
 
     this.selectedTemplate = feedbackTemplate;
   }
@@ -439,5 +449,23 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     return this.allOutcomes.filter((outcome) =>
       learningOutcome.linkedOutcomeIds.includes(outcome.id),
     );
+  }
+
+  onTemplateTypeChange(event: MatSelectChange): void {
+    if (!this.selectedTemplate.isNew) {
+      this.alerts.error('Template type change forbidden.');
+      event.source.writeValue(this.selectedTemplate.type);
+    } else {
+      this.selectedTemplate.type = event.value;
+    }
+  }
+
+  getPossibleParents(): FeedbackTemplate[] {
+    return this.possibleParents.filter((p) => p.id != this.selectedTemplate.id);
+  }
+
+  getParentChipText(parentId: number): string {
+    const parent = this.possibleParents.find((p) => p.id === parentId);
+    return parent ? parent.chipText : '';
   }
 }

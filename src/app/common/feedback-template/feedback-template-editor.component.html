@@ -196,7 +196,7 @@
                 *matCellDef="let feedbackTemplate"
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
-                {{ feedbackTemplate.parentId }}
+                {{ getParentChipText(feedbackTemplate.parentChipId) }}
               </td>
             </ng-container>
             <ng-container matColumnDef="chipText" sticky>
@@ -261,7 +261,7 @@
                     mat-icon-button
                     aria-label="save feedback template"
                     color="primary"
-                    (click)="saveFeedbackTemplate()"
+                    (click)="saveFeedbackTemplate(feedbackTemplate)"
                   >
                     <mat-icon>save</mat-icon>
                   </button>
@@ -321,15 +321,23 @@
               <div class="flex flex-row gap-4">
                 <mat-form-field appearance="outline" class="basis-1/5">
                   <mat-label>Type</mat-label>
-                  <mat-select required [(ngModel)]="selectedTemplate.type">
-                    <mat-option [value]="'Group'">Group</mat-option>
-                    <mat-option [value]="'Template'">Template</mat-option>
+                  <mat-select
+                    required
+                    [value]="selectedTemplate.type"
+                    (selectionChange)="onTemplateTypeChange($event)"
+                  >
+                    <mat-option [value]="'group'">Group</mat-option>
+                    <mat-option [value]="'template'">Template</mat-option>
                   </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="basis-1/5">
                   <mat-label>Parent</mat-label>
-                  <mat-select required [(ngModel)]="selectedTemplate.parent"> </mat-select>
+                  <mat-select [(ngModel)]="selectedTemplate.parentChipId">
+                    <mat-option *ngFor="let parent of getPossibleParents()" [value]="parent.id">
+                      {{ parent.chipText }}
+                    </mat-option>
+                  </mat-select>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="basis-1/5">
@@ -355,7 +363,7 @@
                 </mat-form-field>
               </div>
 
-              @if (selectedTemplate.type === 'Template') {
+              @if (selectedTemplate.type === 'template') {
                 <mat-form-field appearance="outline" class="flex flex-grow">
                   <mat-label>Comment Text</mat-label>
                   <textarea
@@ -380,7 +388,7 @@
 
                   <mat-form-field appearance="outline" class="basis-1/3">
                     <mat-label>Task Status</mat-label>
-                    <mat-select required [(ngModel)]="selectedTemplate.taskStatus">
+                    <mat-select [(ngModel)]="selectedTemplate.taskStatus">
                       <mat-option [value]="'fix_and_resubmit'">Fix and Resubmit</mat-option>
                       <mat-option [value]="'discuss'">Discuss</mat-option>
                       <mat-option [value]="'redo'">Redo</mat-option>
@@ -393,7 +401,13 @@
 
               <div class="flex">
                 <span class="flex-grow"></span>
-                <button mat-raised-button color="primary">Save Template</button>
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="saveFeedbackTemplate(selectedTemplate)"
+                >
+                  Save Template
+                </button>
               </div>
             </div>
           }

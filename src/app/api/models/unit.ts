@@ -22,7 +22,6 @@ import {
   Project,
   TutorialStreamService,
   UnitRoleService,
-  FeedbackTemplate,
 } from './doubtfire-model';
 import {LearningOutcome} from './learning-outcome';
 import {AlertService} from 'src/app/common/services/alert.service';
@@ -74,8 +73,6 @@ export class Unit extends Entity {
     new EntityCache<TaskDefinition>();
   public readonly taskOutcomeAlignmentsCache: EntityCache<TaskOutcomeAlignment> =
     new EntityCache<TaskOutcomeAlignment>();
-  public readonly feedbackTemplateCache: EntityCache<FeedbackTemplate> =
-    new EntityCache<FeedbackTemplate>();
 
   readonly staffCache: EntityCache<UnitRole> = new EntityCache<UnitRole>();
 
@@ -389,10 +386,6 @@ export class Unit extends Entity {
 
   public getOutcomeBatchUploadUrl(): string {
     return `${AppInjector.get(DoubtfireConstants).API_URL}/units/${this.id}/outcomes/csv`;
-  }
-
-  public getFeedbackTemplateBatchUploadUrl(): string {
-    return `${AppInjector.get(DoubtfireConstants).API_URL}/units/${this.id}/feedback_templates/csv`;
   }
 
   public hasStreams(): boolean {
