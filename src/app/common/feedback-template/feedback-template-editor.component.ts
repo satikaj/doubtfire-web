@@ -461,7 +461,9 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   }
 
   getPossibleParents(): FeedbackTemplate[] {
-    return this.possibleParents.filter((p) => p.id != this.selectedTemplate.id);
+    if (!this.selectedTemplate.isNew)
+      return this.possibleParents.filter((p) => p.id != this.selectedTemplate.id);
+    else return this.possibleParents;
   }
 
   getParentChipText(parentId: number): string {
