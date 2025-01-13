@@ -1,24 +1,22 @@
 <mat-card
-  class="feedback-template-picker-card p-2 bg-white bg-opacity-90 rounded-lg border border-gray-300 shadow-none flex flex-col w-[338px] h-[423px]"
+  class="p-2 bg-white rounded-lg border border-gray-300 shadow-none flex flex-col w-[338px] h-[423px]"
 >
   <mat-tab-group (selectedTabChange)="scrollToSection($event)" class="category-tab-group">
     <mat-tab *ngFor="let category of categories" [label]="category.name"></mat-tab>
   </mat-tab-group>
 
-  <mat-form-field class="w-full">
+  <mat-form-field appearance="outline" class="template-search w-full pt-2">
     <input
       matInput
       placeholder="Search templates"
       [(ngModel)]="searchTerm"
       (input)="filterTemplates()"
     />
-    <button mat-icon-button matSuffix aria-label="Search">
-      <mat-icon>search</mat-icon>
-    </button>
+    <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
-  <div class="scrollable-content overflow-y-auto flex-grow">
-    <div #tloSection class="template-category mt-2">
+  <div class="overflow-y-auto flex-grow">
+    <div #tloSection class="mt-2">
       <h4 class="text-gray-700 font-semibold">TLO</h4>
       <div class="template-grid flex flex-wrap gap-1.5 mt-1">
         <mat-chip
@@ -26,7 +24,7 @@
           (mouseenter)="onHoverTemplate(template)"
           (mouseleave)="onHoverTemplate('')"
           (click)="selectTemplate(template)"
-          class="template-chip px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
         >
           {{ template }}
         </mat-chip>
@@ -41,22 +39,7 @@
           (mouseenter)="onHoverTemplate(template)"
           (mouseleave)="onHoverTemplate('')"
           (click)="selectTemplate(template)"
-          class="template-chip px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        >
-          {{ template }}
-        </mat-chip>
-      </div>
-    </div>
-
-    <div #cloSection class="template-category mt-2">
-      <h4 class="text-gray-700 font-semibold">CLO</h4>
-      <div class="template-grid flex flex-wrap gap-1.5 mt-1">
-        <mat-chip
-          *ngFor="let template of filteredCategories[2].templates"
-          (mouseenter)="onHoverTemplate(template)"
-          (mouseleave)="onHoverTemplate('')"
-          (click)="selectTemplate(template)"
-          class="template-chip px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
         >
           {{ template }}
         </mat-chip>
@@ -67,26 +50,11 @@
       <h4 class="text-gray-700 font-semibold">GLO</h4>
       <div class="template-grid flex flex-wrap gap-1.5 mt-1">
         <mat-chip
-          *ngFor="let template of filteredCategories[3].templates"
+          *ngFor="let template of filteredCategories[2].templates"
           (mouseenter)="onHoverTemplate(template)"
           (mouseleave)="onHoverTemplate('')"
           (click)="selectTemplate(template)"
-          class="template-chip px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        >
-          {{ template }}
-        </mat-chip>
-      </div>
-    </div>
-
-    <div #sectionSection class="template-category mt-2">
-      <h4 class="text-gray-700 font-semibold">Section</h4>
-      <div class="template-grid flex flex-wrap gap-1.5 mt-1">
-        <mat-chip
-          *ngFor="let template of filteredCategories[4].templates"
-          (mouseenter)="onHoverTemplate(template)"
-          (mouseleave)="onHoverTemplate('')"
-          (click)="selectTemplate(template)"
-          class="template-chip px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
         >
           {{ template }}
         </mat-chip>
@@ -94,10 +62,10 @@
     </div>
   </div>
 
-  <div class="hovered-template-display text-gray-600">
-    <p class="pt-5 mb-0">{{ hoveredTemplate || 'Template A1' }}</p>
+  <div>
+    <p class="pt-5 mb-0">{{ hoveredTemplate || 'Select a feedback chip' }}</p>
     <p class="pt-1 pb-2 mb-0">
-      This template will populate {{ hoveredTemplate || 'Template A1' }} text.
+      {{ hoveredTemplate || 'This will populate the comment area with feedback.' }}
     </p>
   </div>
 </mat-card>
