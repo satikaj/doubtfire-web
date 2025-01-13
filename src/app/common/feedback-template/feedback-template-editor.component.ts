@@ -347,7 +347,8 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
 
   public downloadCsv(type: 'learning-outcomes' | 'feedback-templates') {
     let name: string = '';
-    if (this.context instanceof TaskDefinition) name = this.context.abbreviation;
+    if (type === 'feedback-templates') name = this.selectedOutcome.abbreviation;
+    else if (this.context instanceof TaskDefinition) name = this.context.abbreviation;
     else if (this.context instanceof Unit) name = this.context.code;
 
     const url =
@@ -371,6 +372,10 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     learningOutcome.abbreviation = this.abbreviationPrefix;
     learningOutcome.shortDescription = '';
     learningOutcome.fullOutcomeDescription = '';
+    this.selectedConnectedOutcomes.update((_selectedConnectedOutcomes) => []);
+
+    this.templateSource = new MatTableDataSource<FeedbackTemplate>([]);
+    this.templateTable.renderRows();
 
     this.selectedOutcome = learningOutcome;
   }
