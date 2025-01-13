@@ -559,7 +559,12 @@ export class Unit extends Entity {
   }
 
   public hasD2lMapping(): boolean {
-    return this.d2lMapping !== undefined && this.d2lMapping.orgUnitId.length > 0;
+    const doubtfireConstants = AppInjector.get(DoubtfireConstants);
+    return (
+      doubtfireConstants.IsD2LEnabled.value &&
+      this.d2lMapping !== undefined &&
+      this.d2lMapping.orgUnitId.length > 0
+    );
   }
 
   public loadD2lMapping(): Observable<D2lAssessmentMapping> {

@@ -418,11 +418,13 @@
         <!--/active-->
       </div>
 
-      <div class="panel-footer">
-          <a class="btn btn-info" ng-click="addD2lData()" ng-enabled="unit.id != -1">
-            <header>D2L Details</header>
-          </a>
-          <div class="pull-right">
+      <div class="panel-footer text-right">
+          <div class="pull-left">
+            <a class="btn btn-info" ng-click="addD2lData()" ng-enabled="unit.id != -1" ng-hide="!d2lEnabled()">
+              <header>D2L Details</header>
+            </a>
+          </div>
+          <div>
             <a class="btn btn-success" ui-sref="units/rollover">
               <header>Rollover</header>
             </a>

@@ -80,6 +80,9 @@ angular.module('doubtfire.units.states.edit.directives.unit-details-editor', [])
     $scope.addD2lData = ->
       D2lUnitDetailsModal.open($scope.unit)
 
+    $scope.d2lEnabled = ->
+      DoubtfireConstants.IsD2LEnabled.value
+
 )
 
 
