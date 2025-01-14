@@ -231,30 +231,32 @@ export class GlobalStateService implements OnDestroy {
         },
       });
 
-      this.learningOutcomeService
-        .query({}, {endpointFormat: LearningOutcomeService.globalEndpoint})
-        .subscribe({
-          next: (_response) => {
-            subscriber.next(true);
-          },
-          error: (_response) => {
-            this.alerts.error('Unable to access service. Failed loading GLOs.', 6000);
-          },
-        });
+      if (this.userService.currentUser.isStaff) {
+        this.learningOutcomeService
+          .query({}, {endpointFormat: LearningOutcomeService.globalEndpoint})
+          .subscribe({
+            next: (_response) => {
+              subscriber.next(true);
+            },
+            error: (_response) => {
+              this.alerts.error('Unable to access service. Failed loading GLOs.', 6000);
+            },
+          });
 
-      this.feedbackTemplateService
-        .query({}, {endpointFormat: FeedbackTemplateService.globalEndpoint})
-        .subscribe({
-          next: (_response) => {
-            subscriber.next(true);
-          },
-          error: (_response) => {
-            this.alerts.error(
-              'Unable to access service. Failed loading GLO feedback templates.',
-              6000,
-            );
-          },
-        });
+        this.feedbackTemplateService
+          .query({}, {endpointFormat: FeedbackTemplateService.globalEndpoint})
+          .subscribe({
+            next: (_response) => {
+              subscriber.next(true);
+            },
+            error: (_response) => {
+              this.alerts.error(
+                'Unable to access service. Failed loading GLO feedback templates.',
+                6000,
+              );
+            },
+          });
+      }
 
       // Loading teaching periods
       this.teachingPeriodService.query().subscribe({

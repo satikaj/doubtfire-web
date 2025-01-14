@@ -178,7 +178,7 @@
           emoji_emotions</mat-icon
         >
       </div>
-      <div id="innerButtons" [hidden]="recording">
+      <div id="innerButtons" [hidden]="recording || !isStaff">
         <mat-icon
           matTooltip="Choose feedback templates"
           matTooltipShowDelay="400"
