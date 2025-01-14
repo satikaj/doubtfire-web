@@ -1,5 +1,5 @@
 import {Entity, EntityMapping} from 'ngx-entity-service';
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {AppInjector} from 'src/app/app-injector';
 import {LearningOutcomeService, TaskDefinition, Unit} from './doubtfire-model';
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
@@ -26,47 +26,68 @@ export class LearningOutcome extends Entity {
 
     if (this.context) {
       if (this.isNew) {
-        return svc.create(
-          {
-            contextType: this.contextTypePath[this.contextType],
-            contextId: this.contextId,
-          },
-          {
-            entity: this,
-            cache: this.context.learningOutcomesCache,
-          },
-        );
+        return svc
+          .create(
+            {
+              contextType: this.contextTypePath[this.contextType],
+              contextId: this.contextId,
+            },
+            {
+              entity: this,
+              cache: this.context.learningOutcomesCache,
+            },
+          )
+          .pipe(
+            tap((response: LearningOutcome) => {
+              Object.assign(this, response);
+            }),
+          );
       } else {
-        return svc.update(
-          {
-            contextType: this.contextTypePath[this.contextType],
-            contextId: this.contextId,
-            id: this.id,
-          },
-          {
-            entity: this,
-            cache: this.context.learningOutcomesCache,
-            endpointFormat: LearningOutcomeService.updateEndpoint,
-          },
-        );
+        return svc
+          .update(
+            {
+              contextType: this.contextTypePath[this.contextType],
+              contextId: this.contextId,
+              id: this.id,
+            },
+            {
+              entity: this,
+              cache: this.context.learningOutcomesCache,
+              endpointFormat: LearningOutcomeService.updateEndpoint,
+            },
+          )
+          .pipe(
+            tap((response: LearningOutcome) => {
+              Object.assign(this, response);
+            }),
+          );
       }
     } else {
       // GLO
       if (this.isNew) {
-        return svc.create(
-          {},
-          {entity: this, endpointFormat: LearningOutcomeService.globalEndpoint},
-        );
+        return svc
+          .create({}, {entity: this, endpointFormat: LearningOutcomeService.globalEndpoint})
+          .pipe(
+            tap((response: LearningOutcome) => {
+              Object.assign(this, response);
+            }),
+          );
       } else {
-        return svc.update(
-          {
-            id: this.id,
-          },
-          {
-            entity: this,
-            endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
-          },
-        );
+        return svc
+          .update(
+            {
+              id: this.id,
+            },
+            {
+              entity: this,
+              endpointFormat: LearningOutcomeService.updateGlobalEndpoint,
+            },
+          )
+          .pipe(
+            tap((response: LearningOutcome) => {
+              Object.assign(this, response);
+            }),
+          );
       }
     }
   }

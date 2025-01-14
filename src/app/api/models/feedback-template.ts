@@ -1,5 +1,5 @@
 import {Entity, EntityMapping} from 'ngx-entity-service';
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {AppInjector} from 'src/app/app-injector';
 import {FeedbackTemplateService} from '../services/feedback-template.service';
 
@@ -18,12 +18,24 @@ export class FeedbackTemplate extends Entity {
     const svc = AppInjector.get(FeedbackTemplateService);
 
     if (this.isNew) {
-      return svc.create({}, {entity: this, endpointFormat: FeedbackTemplateService.addEndpoint});
+      return svc
+        .create({}, {entity: this, endpointFormat: FeedbackTemplateService.addEndpoint})
+        .pipe(
+          tap((response: FeedbackTemplate) => {
+            Object.assign(this, response);
+          }),
+        );
     } else {
-      return svc.update(
-        {id: this.id},
-        {entity: this, endpointFormat: FeedbackTemplateService.updateEndpoint},
-      );
+      return svc
+        .update(
+          {id: this.id},
+          {entity: this, endpointFormat: FeedbackTemplateService.updateEndpoint},
+        )
+        .pipe(
+          tap((response: FeedbackTemplate) => {
+            Object.assign(this, response);
+          }),
+        );
     }
   }
 
