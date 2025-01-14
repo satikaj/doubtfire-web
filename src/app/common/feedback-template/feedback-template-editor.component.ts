@@ -215,6 +215,7 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
         this.selectedOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
       }
 
+      this.selectedTemplate = null;
       this.getFeedbackChips();
     }
   }
@@ -362,9 +363,8 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
   public createLearningOutcome() {
     const learningOutcome = new LearningOutcome();
 
-    learningOutcome.context = this.context;
-
     if (this.context) {
+      learningOutcome.context = this.context;
       if (this.context instanceof TaskDefinition) learningOutcome.contextType = 'TaskDefinition';
       else if (this.context instanceof Unit) learningOutcome.contextType = 'Unit';
       learningOutcome.contextId = this.context.id;
@@ -374,13 +374,21 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     learningOutcome.fullOutcomeDescription = '';
     this.selectedConnectedOutcomes.update((_selectedConnectedOutcomes) => []);
 
-    this.templateSource = new MatTableDataSource<FeedbackTemplate>([]);
-    this.templateTable.renderRows();
+    if (this.selectedOutcome) {
+      this.templateSource = new MatTableDataSource<FeedbackTemplate>([]);
+      this.templateTable.renderRows();
+      this.selectedTemplate = null;
+    }
 
     this.selectedOutcome = learningOutcome;
   }
 
   public createFeedbackTemplate() {
+    if (this.selectedOutcome.isNew) {
+      this.alerts.error('Save the new outcome to proceed.');
+      return;
+    }
+
     const feedbackTemplate = new FeedbackTemplate();
 
     feedbackTemplate.type = 'template';
