@@ -11,6 +11,8 @@ import {
   signal,
   effect,
   ViewChild,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import {MatTable, MatTableDataSource} from '@angular/material/table';
 import {MatPaginator} from '@angular/material/paginator';
@@ -42,7 +44,9 @@ import {isEqual} from 'lodash';
   selector: 'f-feedback-template-editor',
   templateUrl: 'feedback-template-editor.component.html',
 })
-export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class FeedbackTemplateEditorComponent
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
   @Input() context?: TaskDefinition | Unit;
 
   @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
@@ -129,19 +133,6 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
     }
 
     this.subscriptions.push(
-      this.context.learningOutcomesCache.values.subscribe((learningOutcomes) => {
-        this.outcomeSource = new MatTableDataSource<LearningOutcome>(learningOutcomes);
-        this.outcomeSource.paginator = this.outcomePaginator;
-        this.outcomeSource.sort = this.outcomeSort;
-        this.outcomeSource.filterPredicate = (data: LearningOutcome, filter: string) => {
-          const filterValue = filter.trim().toLowerCase();
-          return (
-            data.abbreviation.toLowerCase().includes(filterValue) ||
-            data.shortDescription.toLowerCase().includes(filterValue) ||
-            data.fullOutcomeDescription.toLowerCase().includes(filterValue)
-          );
-        };
-      }),
       this.learningOutcomeService.cache.values.subscribe((outcomes) => {
         const glos = outcomes.filter((outcome) => outcome.contextType === null);
         this.allOutcomes = [...this.allOutcomes, ...glos];
@@ -155,6 +146,24 @@ export class FeedbackTemplateEditorComponent implements OnInit, AfterViewInit, O
         }),
       );
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.subscriptions.push(
+      this.context.learningOutcomesCache.values.subscribe((learningOutcomes) => {
+        this.outcomeSource = new MatTableDataSource<LearningOutcome>(learningOutcomes);
+        this.outcomeSource.paginator = this.outcomePaginator;
+        this.outcomeSource.sort = this.outcomeSort;
+        this.outcomeSource.filterPredicate = (data: LearningOutcome, filter: string) => {
+          const filterValue = filter.trim().toLowerCase();
+          return (
+            data.abbreviation.toLowerCase().includes(filterValue) ||
+            data.shortDescription.toLowerCase().includes(filterValue) ||
+            data.fullOutcomeDescription.toLowerCase().includes(filterValue)
+          );
+        };
+      }),
+    );
   }
 
   ngOnDestroy(): void {
