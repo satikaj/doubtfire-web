@@ -39,6 +39,7 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {FileDownloaderService} from '../file-downloader/file-downloader.service';
 import {isEqual} from 'lodash';
+import {LearningOutcomeCsvDownloadModalService} from './learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.service';
 
 @Component({
   selector: 'f-feedback-template-editor',
@@ -92,6 +93,7 @@ export class FeedbackTemplateEditorComponent
     private learningOutcomeService: LearningOutcomeService,
     private feedbackTemplateService: FeedbackTemplateService,
     private fileDownloaderService: FileDownloaderService,
+    private learningOutcomeCsvDownloadModalService: LearningOutcomeCsvDownloadModalService,
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
@@ -359,10 +361,14 @@ export class FeedbackTemplateEditorComponent
   }
 
   public downloadCsv(type: 'learning-outcomes' | 'feedback-templates') {
+    if (this.context instanceof Unit) {
+      this.learningOutcomeCsvDownloadModalService.show(this.context);
+      return;
+    }
+
     let name: string = '';
     if (type === 'feedback-templates') name = this.selectedOutcome.abbreviation;
     else if (this.context instanceof TaskDefinition) name = this.context.abbreviation;
-    else if (this.context instanceof Unit) name = this.context.code;
 
     const url =
       type === 'learning-outcomes'

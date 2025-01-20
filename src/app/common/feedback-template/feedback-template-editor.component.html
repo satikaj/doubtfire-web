@@ -103,11 +103,21 @@
       [pageSizeOptions]="[5, 10, 25, 100]"
     ></mat-paginator>
     <span class="flex-grow"></span>
-    <label>Learning Outcomes CSV</label>
-    <button mat-icon-button (click)="downloadCsv('learning-outcomes')">
+    @if (abbreviationPrefix !== 'GLO') {
+      <label>Learning Outcomes CSV</label>
+      <button mat-icon-button (click)="downloadCsv('learning-outcomes')">
+        <mat-icon>download</mat-icon>
+      </button>
+      <button mat-icon-button (click)="uploadCsv('Learning Outcomes')">
+        <mat-icon>upload_file</mat-icon>
+      </button>
+      <span class="flex-grow"></span>
+    }
+    <label>Feedback Templates CSV</label>
+    <button mat-icon-button (click)="downloadCsv('feedback-templates')">
       <mat-icon>download</mat-icon>
     </button>
-    <button mat-icon-button (click)="uploadCsv('Learning Outcomes')">
+    <button mat-icon-button (click)="uploadCsv('Feedback Templates')">
       <mat-icon>upload_file</mat-icon>
     </button>
     <span class="flex-grow"></span>
@@ -318,14 +328,6 @@
               class="mat-elevation-z0"
               [pageSizeOptions]="[5, 10, 25, 100]"
             ></mat-paginator>
-            <span class="flex-grow"></span>
-            <label>Feedback Templates CSV</label>
-            <button mat-icon-button (click)="downloadCsv('feedback-templates')">
-              <mat-icon>download</mat-icon>
-            </button>
-            <button mat-icon-button (click)="uploadCsv('Feedback Templates')">
-              <mat-icon>upload_file</mat-icon>
-            </button>
             <span class="flex-grow"></span>
             <button mat-raised-button color="primary" (click)="createFeedbackTemplate()">
               Add Template
