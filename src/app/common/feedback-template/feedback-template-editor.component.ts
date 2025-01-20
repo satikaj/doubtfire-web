@@ -73,6 +73,7 @@ export class FeedbackTemplateEditorComponent
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
+    'icon',
     'parent',
     'chipText',
     'description',
@@ -164,6 +165,8 @@ export class FeedbackTemplateEditorComponent
         };
       }),
     );
+
+    this.selectedOutcome = null;
   }
 
   ngOnDestroy(): void {
@@ -378,7 +381,7 @@ export class FeedbackTemplateEditorComponent
       else if (this.context instanceof Unit) learningOutcome.contextType = 'Unit';
       learningOutcome.contextId = this.context.id;
     }
-    learningOutcome.abbreviation = this.abbreviationPrefix;
+    learningOutcome.abbreviation = this.abbreviationPrefix + String(this.getNextOutcomeNumber());
     learningOutcome.shortDescription = '';
     learningOutcome.fullOutcomeDescription = '';
     this.selectedConnectedOutcomes.update((_selectedConnectedOutcomes) => []);
@@ -491,5 +494,14 @@ export class FeedbackTemplateEditorComponent
   getParentChipText(parentId: number): string {
     const parent = this.possibleParents.find((p) => p.id === parentId);
     return parent ? parent.chipText : '';
+  }
+
+  getNextOutcomeNumber(): number {
+    if (this.outcomeSource.data && this.outcomeSource.data.length > 0) {
+      let abbr = this.outcomeSource.data[this.outcomeSource.data.length - 1].abbreviation;
+      abbr = abbr.replace(this.abbreviationPrefix, '');
+      return Number(abbr) + 1;
+    }
+    return 1;
   }
 }
