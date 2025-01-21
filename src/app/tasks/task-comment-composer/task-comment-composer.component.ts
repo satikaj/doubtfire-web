@@ -10,6 +10,8 @@ import {
   ElementRef,
   ViewChild,
   DoCheck,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 import {trigger, style, animate, transition} from '@angular/animations';
 import {analyticsService} from 'src/app/ajs-upgraded-providers';
@@ -66,9 +68,13 @@ const ACCEPTED_FILE_TYPES = [
     ]),
   ],
 })
-export class TaskCommentComposerComponent implements DoCheck {
+export class TaskCommentComposerComponent implements DoCheck, OnChanges {
   @Input() task: Task;
   @Input() sharedData: TaskCommentComposerData;
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.showFeedbackTemplatePicker = false;
+  }
 
   public $userIsTyping = new BehaviorSubject<boolean>(false);
 
