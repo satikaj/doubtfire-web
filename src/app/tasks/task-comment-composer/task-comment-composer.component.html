@@ -1,6 +1,7 @@
 @if (task) {
   <f-task-feedback-templates
     [task]="task"
+    (templateSelected)="addFeedback($event)"
     [hidden]="!this.showFeedbackTemplatePicker"
     class="feedback-template-picker"
   ></f-task-feedback-templates>

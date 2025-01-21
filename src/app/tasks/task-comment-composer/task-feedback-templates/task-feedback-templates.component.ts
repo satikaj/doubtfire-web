@@ -3,9 +3,11 @@ import {
   ElementRef,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation,
+  EventEmitter,
 } from '@angular/core';
 import {combineLatest, map, Observable} from 'rxjs';
 import {LearningOutcome, FeedbackTemplate, Task} from 'src/app/api/models/doubtfire-model';
@@ -20,6 +22,7 @@ import {LearningOutcomeService} from 'src/app/api/services/learning-outcome.serv
 })
 export class TaskFeedbackTemplatesComponent implements OnChanges {
   @Input() task: Task;
+  @Output() templateSelected = new EventEmitter<FeedbackTemplate>();
   categories = ['TLO', 'ULO', 'GLO'];
   searchTerm: string = '';
   hoveredTemplate: FeedbackTemplate;
@@ -90,7 +93,7 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
   }
 
   selectTemplate(template: FeedbackTemplate) {
-    console.log('Selected template:', template);
+    this.templateSelected.emit(template);
   }
 
   onHoverTemplate(template: FeedbackTemplate) {

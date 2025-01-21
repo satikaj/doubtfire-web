@@ -17,7 +17,12 @@ import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog
 import {EmojiSearch} from '@ctrl/ngx-emoji-mart';
 import {EmojiData} from '@ctrl/ngx-emoji-mart/ngx-emoji/';
 import {EmojiService} from 'src/app/common/services/emoji.service';
-import {Task, TaskComment, TaskCommentService} from 'src/app/api/models/doubtfire-model';
+import {
+  Task,
+  TaskComment,
+  TaskCommentService,
+  FeedbackTemplate,
+} from 'src/app/api/models/doubtfire-model';
 import {TaskCommentsViewerComponent} from '../task-comments-viewer/task-comments-viewer.component';
 import {BehaviorSubject} from 'rxjs';
 import {AlertService} from 'src/app/common/services/alert.service';
@@ -235,6 +240,17 @@ export class TaskCommentComposerComponent implements DoCheck {
     } else {
       char = e.emoji.native;
     }
+    const text = this.input.first.nativeElement.innerText;
+    const position = this.caretOffset();
+    this.input.first.nativeElement.innerText = [
+      text.slice(0, position),
+      char,
+      text.slice(position),
+    ].join('');
+  }
+
+  addFeedback(template: FeedbackTemplate): void {
+    const char = template.commentText;
     const text = this.input.first.nativeElement.innerText;
     const position = this.caretOffset();
     this.input.first.nativeElement.innerText = [
