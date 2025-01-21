@@ -29,9 +29,7 @@ export class TaskFeedbackTemplatesComponent {
 
   @ViewChild('tloSection') tloSection!: ElementRef;
   @ViewChild('uloSection') uloSection!: ElementRef;
-  @ViewChild('cloSection') cloSection!: ElementRef;
   @ViewChild('gloSection') gloSection!: ElementRef;
-  @ViewChild('sectionSection') sectionSection!: ElementRef;
 
   scrollToSection(event: any) {
     const sections = [this.tloSection, this.uloSection, this.gloSection];
