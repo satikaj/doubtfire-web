@@ -201,6 +201,7 @@ export class FeedbackTemplateEditorComponent
       next: () => {
         this.alerts.success('Outcome saved');
         learningOutcome.setOriginalSaveData(this.learningOutcomeService.mapping);
+        this.selectLearningOutcome(this.selectedOutcome);
       },
       error: () => this.alerts.error('Failed to save learning outcome. Please try again.'),
     });
@@ -211,6 +212,7 @@ export class FeedbackTemplateEditorComponent
       next: () => {
         this.alerts.success('Template saved');
         feedbackTemplate.setOriginalSaveData(this.feedbackTemplateService.mapping);
+        this.selectFeedbackTemplate(this.selectedTemplate);
       },
       error: () => this.alerts.error('Failed to save feedback template. Please try again.'),
     });
@@ -320,7 +322,11 @@ export class FeedbackTemplateEditorComponent
       'Are you sure you want to delete this outcome? This action is final.',
       () => {
         learningOutcome.delete().subscribe({
-          next: () => this.alerts.success('Learning outcome deleted'),
+          next: () => {
+            this.alerts.success('Learning outcome deleted');
+            if (this.selectedOutcome === learningOutcome)
+              this.selectLearningOutcome(this.selectedOutcome);
+          },
           error: () => this.alerts.error('Failed to delete learning outcome. Please try again.'),
         });
       },
@@ -333,7 +339,11 @@ export class FeedbackTemplateEditorComponent
       'Are you sure you want to delete this template? This action is final.',
       () => {
         feedbackTemplate.delete().subscribe({
-          next: () => this.alerts.success('Feedback template deleted'),
+          next: () => {
+            this.alerts.success('Feedback template deleted');
+            if (this.selectedTemplate === feedbackTemplate)
+              this.selectFeedbackTemplate(this.selectedTemplate);
+          },
           error: () => this.alerts.error('Failed to delete feedback template. Please try again.'),
         });
       },
@@ -392,11 +402,8 @@ export class FeedbackTemplateEditorComponent
     learningOutcome.fullOutcomeDescription = '';
     this.selectedConnectedOutcomes.update((_selectedConnectedOutcomes) => []);
 
-    if (this.selectedOutcome) {
-      this.templateSource = new MatTableDataSource<FeedbackTemplate>([]);
-      this.templateTable.renderRows();
-      this.selectedTemplate = null;
-    }
+    this.templateSource = new MatTableDataSource<FeedbackTemplate>([]);
+    this.selectedTemplate = null;
 
     this.selectedOutcome = learningOutcome;
   }
