@@ -1,7 +1,10 @@
-<f-task-feedback-templates
-  [hidden]="!this.showFeedbackTemplatePicker"
-  class="feedback-template-picker"
-></f-task-feedback-templates>
+@if (task) {
+  <f-task-feedback-templates
+    [task]="task"
+    [hidden]="!this.showFeedbackTemplatePicker"
+    class="feedback-template-picker"
+  ></f-task-feedback-templates>
+}
 
 <emoji-mart
   [darkMode]="false"

@@ -2,70 +2,74 @@
   class="p-2 bg-white rounded-lg border border-gray-300 shadow-none flex flex-col w-[338px] h-[423px]"
 >
   <mat-tab-group (selectedTabChange)="scrollToSection($event)" class="category-tab-group">
-    <mat-tab *ngFor="let category of categories" [label]="category.name"></mat-tab>
+    <mat-tab *ngFor="let category of categories" [label]="category"></mat-tab>
   </mat-tab-group>
 
   <mat-form-field appearance="outline" class="template-search w-full pt-2">
-    <input
-      matInput
-      placeholder="Search templates"
-      [(ngModel)]="searchTerm"
-      (input)="filterTemplates()"
-    />
+    <input matInput placeholder="Search templates" [(ngModel)]="searchTerm" />
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
   <div class="overflow-y-auto flex-grow">
-    <div #tloSection class="mt-2">
+    <div #tloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">TLO</h4>
-      <div class="template-grid flex flex-wrap gap-1.5 mt-1">
-        <mat-chip
-          *ngFor="let template of filteredCategories[0].templates"
-          (mouseenter)="onHoverTemplate(template)"
-          (mouseleave)="onHoverTemplate('')"
-          (click)="selectTemplate(template)"
-          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        >
-          {{ template }}
-        </mat-chip>
+      <div *ngFor="let item of tlos$ | async" class="outcome-section mt-4">
+        <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
+        <div class="template-grid flex flex-wrap gap-1.5 mt-1">
+          <mat-chip
+            *ngFor="let template of item.templates"
+            (mouseenter)="onHoverTemplate(template)"
+            (mouseleave)="onHoverTemplate(null)"
+            (click)="selectTemplate(template)"
+            class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          >
+            {{ template.chipText }}
+          </mat-chip>
+        </div>
       </div>
     </div>
 
     <div #uloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">ULO</h4>
-      <div class="template-grid flex flex-wrap gap-1.5 mt-1">
-        <mat-chip
-          *ngFor="let template of filteredCategories[1].templates"
-          (mouseenter)="onHoverTemplate(template)"
-          (mouseleave)="onHoverTemplate('')"
-          (click)="selectTemplate(template)"
-          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        >
-          {{ template }}
-        </mat-chip>
+      <div *ngFor="let item of ulos$ | async" class="outcome-section mt-4">
+        <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
+        <div class="template-grid flex flex-wrap gap-1.5 mt-1">
+          <mat-chip
+            *ngFor="let template of item.templates"
+            (mouseenter)="onHoverTemplate(template)"
+            (mouseleave)="onHoverTemplate(null)"
+            (click)="selectTemplate(template)"
+            class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          >
+            {{ template.chipText }}
+          </mat-chip>
+        </div>
       </div>
     </div>
 
     <div #gloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">GLO</h4>
-      <div class="template-grid flex flex-wrap gap-1.5 mt-1">
-        <mat-chip
-          *ngFor="let template of filteredCategories[2].templates"
-          (mouseenter)="onHoverTemplate(template)"
-          (mouseleave)="onHoverTemplate('')"
-          (click)="selectTemplate(template)"
-          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-        >
-          {{ template }}
-        </mat-chip>
+      <div *ngFor="let item of glos$ | async" class="outcome-section mt-4">
+        <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
+        <div class="template-grid flex flex-wrap gap-1.5 mt-1">
+          <mat-chip
+            *ngFor="let template of item.templates"
+            (mouseenter)="onHoverTemplate(template)"
+            (mouseleave)="onHoverTemplate(null)"
+            (click)="selectTemplate(template)"
+            class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          >
+            {{ template.chipText }}
+          </mat-chip>
+        </div>
       </div>
     </div>
   </div>
 
   <div>
-    <p class="pt-5 mb-0">{{ hoveredTemplate || 'Select a feedback chip' }}</p>
+    <p class="pt-5 mb-0">{{ hoveredTemplate?.chipText || 'Select a feedback chip' }}</p>
     <p class="pt-1 pb-2 mb-0">
-      {{ hoveredTemplate || 'This will populate the comment area with feedback.' }}
+      {{ hoveredTemplate?.description || 'This will populate the comment area with feedback.' }}
     </p>
   </div>
 </mat-card>

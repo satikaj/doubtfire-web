@@ -1,4 +1,16 @@
-import {Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
+import {combineLatest, map, Observable} from 'rxjs';
+import {LearningOutcome, FeedbackTemplate, Task} from 'src/app/api/models/doubtfire-model';
+import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
+import {LearningOutcomeService} from 'src/app/api/services/learning-outcome.service';
 
 @Component({
   selector: 'f-task-feedback-templates',
@@ -6,26 +18,63 @@ import {Component, ElementRef, ViewChild, ViewEncapsulation} from '@angular/core
   templateUrl: './task-feedback-templates.component.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class TaskFeedbackTemplatesComponent {
+export class TaskFeedbackTemplatesComponent implements OnChanges {
+  @Input() task: Task;
+  categories = ['TLO', 'ULO', 'GLO'];
   searchTerm: string = '';
-  hoveredTemplate: string = '';
+  hoveredTemplate: FeedbackTemplate;
 
-  categories = [
-    {name: 'TLO', templates: ['Template A1', 'Template A2', 'Template A3', 'Template A4']},
-    {name: 'ULO', templates: ['Template B1', 'Template B2', 'Template B3', 'Template B4']},
-    {name: 'GLO', templates: ['Template D1', 'Template D2', 'Template D3', 'Template D4']},
-  ];
+  public tlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
+  public ulos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
 
-  filteredCategories = [...this.categories];
+  constructor(
+    private learningOutcomeService: LearningOutcomeService,
+    private feedbackTemplateService: FeedbackTemplateService,
+  ) {}
 
-  filterTemplates() {
-    this.filteredCategories = this.categories.map((category) => ({
-      ...category,
-      templates: category.templates.filter((template) =>
-        template.toLowerCase().includes(this.searchTerm.toLowerCase()),
-      ),
-    }));
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.task && this.task.definition) {
+      this.tlos$ = combineLatest([
+        this.task.definition.learningOutcomesCache.values,
+        this.feedbackTemplateService.cache.values,
+      ]).pipe(
+        map(([outcomes, templates]) =>
+          outcomes.map((outcome) => ({
+            outcome: outcome,
+            templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
+          })),
+        ),
+      );
+    }
+
+    if (this.task.unit) {
+      this.ulos$ = combineLatest([
+        this.task.unit.learningOutcomesCache.values,
+        this.feedbackTemplateService.cache.values,
+      ]).pipe(
+        map(([outcomes, templates]) =>
+          outcomes.map((outcome) => ({
+            outcome: outcome,
+            templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
+          })),
+        ),
+      );
+    }
   }
+
+  public glos$ = combineLatest([
+    this.learningOutcomeService.cache.values,
+    this.feedbackTemplateService.cache.values,
+  ]).pipe(
+    map(([outcomes, templates]) =>
+      outcomes
+        .filter((outcome) => outcome.contextType === null)
+        .map((outcome) => ({
+          outcome: outcome,
+          templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
+        })),
+    ),
+  );
 
   @ViewChild('tloSection') tloSection!: ElementRef;
   @ViewChild('uloSection') uloSection!: ElementRef;
@@ -40,11 +89,11 @@ export class TaskFeedbackTemplatesComponent {
     }
   }
 
-  selectTemplate(template: string) {
+  selectTemplate(template: FeedbackTemplate) {
     console.log('Selected template:', template);
   }
 
-  onHoverTemplate(template: string) {
+  onHoverTemplate(template: FeedbackTemplate) {
     this.hoveredTemplate = template;
   }
 }
