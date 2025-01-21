@@ -225,6 +225,8 @@ import {MarkedPipe} from './common/pipes/marked.pipe';
 import {AlertService} from './common/services/alert.service';
 import {GradeService} from './common/services/grade.service';
 import {TaskScormCardComponent} from './projects/states/dashboard/directives/task-dashboard/directives/task-scorm-card/task-scorm-card.component';
+import { D2lUnitDetailsModal } from './units/states/edit/directives/unit-details-editor/d2l-details-form/d2l-unit-details-form.component';
+import { D2lTransferModal } from './units/states/portfolios/d2l-transfer-modal/d2l-transfer.component';
 
 export const DoubtfireAngularJSModule = angular.module('doubtfire', [
   'doubtfire.config',
@@ -236,11 +238,15 @@ export const DoubtfireAngularJSModule = angular.module('doubtfire', [
   'doubtfire.projects',
   'doubtfire.groups',
   'doubtfire.visualisations',
-]);
+]).config(['$locationProvider', ($locationProvider) => {
+  $locationProvider.html5Mode(true);
+}]);
 
 // Downgrade angular modules that we need...
 // factory -> service
 DoubtfireAngularJSModule.factory('AboutDoubtfireModal', downgradeInjectable(AboutDoubtfireModal));
+DoubtfireAngularJSModule.factory('D2lUnitDetailsModal', downgradeInjectable(D2lUnitDetailsModal));
+DoubtfireAngularJSModule.factory('D2lTransferModal', downgradeInjectable(D2lTransferModal));
 DoubtfireAngularJSModule.factory('DoubtfireConstants', downgradeInjectable(DoubtfireConstants));
 DoubtfireAngularJSModule.factory('ExtensionModal', downgradeInjectable(ExtensionModalService));
 DoubtfireAngularJSModule.factory('Marked', downgradeInjectable(MarkedPipe));

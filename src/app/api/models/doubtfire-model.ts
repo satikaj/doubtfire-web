@@ -62,3 +62,4 @@ export * from '../services/learning-outcome.service';
 export * from '../services/group-set.service';
 export * from '../services/task-similarity.service';
 export * from '../services/test-attempt.service';
+export * from '../models/d2l/d2l_assessment_mapping.service';

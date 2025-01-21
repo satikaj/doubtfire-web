@@ -47,6 +47,7 @@ import {AlertComponent} from 'src/app/common/services/alert.service';
 import {setTheme} from 'ngx-bootstrap/utils';
 
 import {AboutDoubtfireModalService} from 'src/app/common/modals/about-doubtfire-modal/about-doubtfire-modal.service';
+import { D2lUnitDetailsFormComponent, D2lUnitDetailsModal } from './units/states/edit/directives/unit-details-editor/d2l-details-form/d2l-unit-details-form.component';
 import {
   AboutDoubtfireModal,
   AboutDoubtfireModalContent,
@@ -159,6 +160,7 @@ import {
   WebcalService,
   LearningOutcomeService,
   TaskSimilarityService,
+  D2lAssessmentMappingService,
 } from './api/models/doubtfire-model';
 import {FileDownloaderService} from './common/file-downloader/file-downloader.service';
 import {PdfImageCommentComponent} from './tasks/task-comments-viewer/pdf-image-comment/pdf-image-comment.component';
@@ -237,6 +239,8 @@ import {TaskScormCardComponent} from './projects/states/dashboard/directives/tas
 import {TestAttemptService} from './api/services/test-attempt.service';
 import {ScormExtensionCommentComponent} from './tasks/task-comments-viewer/scorm-extension-comment/scorm-extension-comment.component';
 import {ScormExtensionModalComponent} from './common/modals/scorm-extension-modal/scorm-extension-modal.component';
+import { D2lTransferComponent, D2lTransferModal } from './units/states/portfolios/d2l-transfer-modal/d2l-transfer.component';
+import { SuccessCloseComponent } from './common/success-close/success-close.component';
 
 // See https://stackoverflow.com/questions/55721254/how-to-change-mat-datepicker-date-format-to-dd-mm-yyyy-in-simplest-way/58189036#58189036
 const MY_DATE_FORMAT = {
@@ -256,6 +260,8 @@ const MY_DATE_FORMAT = {
   declarations: [
     AlertComponent,
     AboutDoubtfireModalContent,
+    D2lUnitDetailsFormComponent,
+    D2lTransferComponent,
     TeachingPeriodUnitImportDialogComponent,
     TaskCommentComposerComponent,
     AudioCommentRecorderComponent,
@@ -273,6 +279,7 @@ const MY_DATE_FORMAT = {
     ExtensionModalComponent,
     CalendarModalComponent,
     InstitutionSettingsComponent,
+    SuccessCloseComponent,
     HomeComponent,
     CommentBubbleActionComponent,
     UnitTutorialsListComponent,
@@ -367,6 +374,7 @@ const MY_DATE_FORMAT = {
     GroupSetService,
     GroupService,
     UnitService,
+    D2lAssessmentMappingService,
     ProjectService,
     UnitRoleService,
     LearningOutcomeService,
@@ -429,6 +437,8 @@ const MY_DATE_FORMAT = {
     TasksInTutorialsPipe,
     TasksForInboxSearchPipe,
     IsActiveUnitRole,
+    D2lUnitDetailsModal,
+    D2lTransferModal,
     CreateNewUnitModal,
     ScormAdapterService,
     TestAttemptService,
