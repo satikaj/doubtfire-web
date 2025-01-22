@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.30](https://github.com/doubtfire-lms/doubtfire-deploy/compare/v8.0.29...v8.0.30) (2025-01-22)
+
+
+### Features
+
+* add ability to collect d2l org and grade object ids ([93fd614](https://github.com/doubtfire-lms/doubtfire-deploy/commit/93fd6144c798fd302204728a6c2dd43f74d7bf91))
+* add ability to trigger d2l grade transfer ([fd0cc07](https://github.com/doubtfire-lms/doubtfire-deploy/commit/fd0cc0737682e9aa02af14f858c8a5f5f27f22e7))
+* add success page for oauth callback ([921406e](https://github.com/doubtfire-lms/doubtfire-deploy/commit/921406ed595c7a74cb750bc87d49fac0337bdb8a))
+* check if d2l results available ([2460c88](https://github.com/doubtfire-lms/doubtfire-deploy/commit/2460c88af08740f8626ed71d8851a75af095a03d))
+* d2l integration checks settings ([0a61df5](https://github.com/doubtfire-lms/doubtfire-deploy/commit/0a61df53c9fc187b7462e8564a19641ac1693cf0))
+* switch to html5 mode ([9d017fb](https://github.com/doubtfire-lms/doubtfire-deploy/commit/9d017fbfaa1d5bae7f43da37ec7ae43e1dfafa8f))
+
+
+### Bug Fixes
+
+* ensure standard error propagate to the ui ([fd056db](https://github.com/doubtfire-lms/doubtfire-deploy/commit/fd056db47631087d5ef29223bd3dc9037c4b10dd))
+* report better errors during file downloads ([cf87d68](https://github.com/doubtfire-lms/doubtfire-deploy/commit/cf87d68ea3a5433a073ae6db413f8c1f825ada80))
+
 ### [8.0.29](https://github.com/macite/doubtfire-deploy/compare/v8.0.28...v8.0.29) (2024-10-25)
 
 
