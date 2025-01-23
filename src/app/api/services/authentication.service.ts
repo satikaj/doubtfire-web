@@ -24,8 +24,9 @@ export class AuthenticationService {
 
   public checkUserCookie(): void {
     const userData = JSON.parse(localStorage.getItem(this.USERNAME_KEY));
-    const user = new User();
-    Object.assign(user, userData);
+
+    // Get current user from the user service
+    const user = this.userService.cache.getOrCreate(userData.id, this.userService, userData);
 
     if (userData && this.tryChangeUser(user)) {
       // Ensure current user is in cache
