@@ -391,7 +391,7 @@ export class FeedbackTemplateEditorComponent
       name = `${this.selectedOutcome.abbreviation}-${name}`;
     if (this.context instanceof TaskDefinition)
       name = `${this.context.unit.code}-${this.context.abbreviation}-${name}`;
-    else name = `${this.context.code}-${name}`;
+    else if (this.context instanceof Unit) name = `${this.context.code}-${name}`;
 
     if (this.context instanceof Unit && !byOutcome)
       this.nestedCsvDownloadModalService.show(url, name, type);
