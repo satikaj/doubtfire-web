@@ -14,9 +14,9 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import {MatTable, MatTableDataSource} from '@angular/material/table';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatSelectChange} from '@angular/material/select';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSelectChange } from '@angular/material/select';
 import {
   TaskDefinition,
   Unit,
@@ -24,35 +24,34 @@ import {
   LearningOutcomeService,
   FeedbackTemplate,
 } from 'src/app/api/models/doubtfire-model';
-import {AlertService} from 'src/app/common/services/alert.service';
-import {MatSort, Sort} from '@angular/material/sort';
+import { AlertService } from 'src/app/common/services/alert.service';
+import { MatSort, Sort } from '@angular/material/sort';
 import {
   confirmationModal,
   csvResultModalService,
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
-import {Subscription} from 'rxjs';
-import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {MatChipInputEvent} from '@angular/material/chips';
-import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
-import {FileDownloaderService} from '../file-downloader/file-downloader.service';
-import {isEqual} from 'lodash';
-import {LearningOutcomeCsvDownloadModalService} from './learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.service';
+import { Subscription } from 'rxjs';
+import { FeedbackTemplateService } from 'src/app/api/services/feedback-template.service';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FileDownloaderService } from '../file-downloader/file-downloader.service';
+import { isEqual } from 'lodash';
+import { LearningOutcomeCsvDownloadModalService } from './learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.service';
 
 @Component({
   selector: 'f-feedback-template-editor',
   templateUrl: 'feedback-template-editor.component.html',
 })
 export class FeedbackTemplateEditorComponent
-  implements OnInit, OnChanges, AfterViewInit, OnDestroy
-{
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() context?: TaskDefinition | Unit;
 
-  @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
-  @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
-  @ViewChild('outcomePaginator', {static: false}) outcomePaginator: MatPaginator;
+  @ViewChild('outcomeTable', { static: false }) outcomeTable: MatTable<LearningOutcome>;
+  @ViewChild(MatSort, { static: false }) outcomeSort: MatSort;
+  @ViewChild('outcomePaginator', { static: false }) outcomePaginator: MatPaginator;
 
   public outcomeSource: MatTableDataSource<LearningOutcome>;
   public outcomeColumns: string[] = [
@@ -68,9 +67,9 @@ export class FeedbackTemplateEditorComponent
   public allOutcomes: LearningOutcome[] = [];
   public selectedConnectedOutcomes = signal([]);
 
-  @ViewChild('templateTable', {static: false}) templateTable: MatTable<FeedbackTemplate>;
-  @ViewChild(MatSort, {static: false}) templateSort: MatSort;
-  @ViewChild('templatePaginator', {static: false}) templatePaginator: MatPaginator;
+  @ViewChild('templateTable', { static: false }) templateTable: MatTable<FeedbackTemplate>;
+  @ViewChild(MatSort, { static: false }) templateSort: MatSort;
+  @ViewChild('templatePaginator', { static: false }) templatePaginator: MatPaginator;
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
@@ -181,6 +180,7 @@ export class FeedbackTemplateEditorComponent
         (temp) => temp.learningOutcomeId === this.selectedOutcome.id,
       );
       this.possibleParents = outcomeTemplates.filter((temp) => temp.type === 'group');
+
       this.templateSource = new MatTableDataSource<FeedbackTemplate>(outcomeTemplates);
       this.templateSource.paginator = this.templatePaginator;
       this.templateSource.sort = this.templateSort;
@@ -272,22 +272,66 @@ export class FeedbackTemplateEditorComponent
   }
 
   public sortTemplateData(sort: Sort) {
-    const data = this.templateSource.data;
-
     if (!sort.active || sort.direction === '') {
-      this.templateSource.data = data;
       return;
     }
 
-    this.templateSource.data = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
+    const isAsc = sort.direction === 'asc';
+
+    const parents = [...this.possibleParents];
+    const nonParents = this.templateSource.data.filter(
+      (template) => !this.possibleParents.includes(template)
+    );
+
+    // Sort parents first by the selected field
+    parents.sort((a, b) => {
       switch (sort.active) {
         case 'chipText':
-          return this.compare(a.chipText, b.chipText, isAsc);
+          return a.chipText.localeCompare(b.chipText) * (isAsc ? 1 : -1);
+        case 'description':
+          return a.description.localeCompare(b.description) * (isAsc ? 1 : -1);
+        case 'taskStatus':
+          return a.taskStatus.localeCompare(b.taskStatus) * (isAsc ? 1 : -1);
         default:
           return 0;
       }
     });
+
+    const groupedTemplates = new Map<number, FeedbackTemplate[]>();
+    nonParents.forEach((template) => {
+      const parentId = template.parentChipId;
+      if (!groupedTemplates.has(parentId)) {
+        groupedTemplates.set(parentId, []);
+      }
+      groupedTemplates.get(parentId)!.push(template);
+    });
+
+    // Sort children within their parent groups
+    const finalSortedTemplates: FeedbackTemplate[] = [];
+
+    parents.forEach((parent) => {
+      finalSortedTemplates.push(parent); // Add parent first
+
+      // Get and sort children for this parent
+      const children = groupedTemplates.get(parent.id) ?? [];
+      children.sort((a, b) => {
+        switch (sort.active) {
+          case 'chipText':
+            return a.chipText.localeCompare(b.chipText) * (isAsc ? 1 : -1);
+          case 'description':
+            return a.description.localeCompare(b.description) * (isAsc ? 1 : -1);
+          case 'taskStatus':
+            return a.taskStatus.localeCompare(b.taskStatus) * (isAsc ? 1 : -1);
+          default:
+            return 0;
+        }
+      });
+
+      finalSortedTemplates.push(...children);
+    });
+
+    // Replace the data source
+    this.templateSource.data = [...finalSortedTemplates];
   }
 
   public compare(a: number | string, b: number | string, isAsc: boolean): number {
@@ -359,7 +403,7 @@ export class FeedbackTemplateEditorComponent
     this.csvUploadModal.show(
       `Upload ${type} as CSV`,
       'Test message',
-      {file: {name: `${type} CSV Data`, type: 'csv'}},
+      { file: { name: `${type} CSV Data`, type: 'csv' } },
       url,
       (response: any) => {
         this.csvResultModalService.show(`${type} CSV Upload Results`, response);
