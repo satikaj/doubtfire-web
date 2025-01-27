@@ -6,14 +6,18 @@
   </mat-tab-group>
 
   <mat-form-field appearance="outline" class="template-search w-full pt-2">
-    <input matInput placeholder="Search templates" [(ngModel)]="searchTerm" />
+    <input
+      matInput
+      placeholder="Search templates"
+      (input)="onSearchTermChange($event.target.value)"
+    />
     <mat-icon matSuffix>search</mat-icon>
   </mat-form-field>
 
   <div class="overflow-y-auto flex-grow">
     <div #tloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">TLO</h4>
-      <div *ngFor="let item of tlos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of filteredTlos$ | async" class="outcome-section mt-4">
         <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
@@ -31,7 +35,7 @@
 
     <div #uloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">ULO</h4>
-      <div *ngFor="let item of ulos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of filteredUlos$ | async" class="outcome-section mt-4">
         <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
@@ -49,7 +53,7 @@
 
     <div #gloSection class="template-category mt-2">
       <h4 class="text-gray-700 font-semibold">GLO</h4>
-      <div *ngFor="let item of glos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of filteredGlos$ | async" class="outcome-section mt-4">
         <h5 class="text-blue-600 font-bold">{{ item.outcome.abbreviation }}</h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
