@@ -186,6 +186,11 @@ export class TaskDefinition extends Entity {
     return `${constants.API_URL}/task_definitions/${this.id}/outcomes/csv`;
   }
 
+  public getFeedbackTemplateBatchUploadUrl(): string {
+    const constants = AppInjector.get(DoubtfireConstants);
+    return `${constants.API_URL}/task_definitions/${this.id}/feedback_chips/csv`;
+  }
+
   /**
    * Open the SCORM test in a new tab - using preview mode.
    */

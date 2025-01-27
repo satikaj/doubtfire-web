@@ -104,20 +104,20 @@
     ></mat-paginator>
     <span class="flex-grow"></span>
     @if (abbreviationPrefix !== 'GLO') {
-      <label>Learning Outcomes CSV</label>
-      <button mat-icon-button (click)="downloadCsv('learning-outcomes')">
+      <label>Outcomes CSV</label>
+      <button mat-icon-button (click)="downloadCsv('Learning Outcomes', false)">
         <mat-icon>download</mat-icon>
       </button>
-      <button mat-icon-button (click)="uploadCsv('Learning Outcomes')">
+      <button mat-icon-button (click)="uploadCsv('Learning Outcomes', false)">
         <mat-icon>upload_file</mat-icon>
       </button>
       <span class="flex-grow"></span>
     }
-    <label>Feedback Templates CSV</label>
-    <button mat-icon-button (click)="downloadCsv('feedback-templates')">
+    <label>Feedback CSV</label>
+    <button mat-icon-button (click)="downloadCsv('Feedback Templates', false)">
       <mat-icon>download</mat-icon>
     </button>
-    <button mat-icon-button (click)="uploadCsv('Feedback Templates')">
+    <button mat-icon-button (click)="uploadCsv('Feedback Templates', false)">
       <mat-icon>upload_file</mat-icon>
     </button>
     <span class="flex-grow"></span>
@@ -254,7 +254,7 @@
                 *matCellDef="let feedbackTemplate"
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
-                {{ feedbackTemplate.commentText }}
+                {{ feedbackTemplate.type === 'group' ? '' : feedbackTemplate.commentText }}
               </td>
             </ng-container>
             <ng-container matColumnDef="summaryText" sticky>
@@ -329,6 +329,16 @@
               [pageSizeOptions]="[5, 10, 25, 100]"
             ></mat-paginator>
             <span class="flex-grow"></span>
+            @if (abbreviationPrefix !== 'GLO') {
+              <label>Feedback CSV</label>
+              <button mat-icon-button (click)="downloadCsv('Feedback Templates', true)">
+                <mat-icon>download</mat-icon>
+              </button>
+              <button mat-icon-button (click)="uploadCsv('Feedback Templates', true)">
+                <mat-icon>upload_file</mat-icon>
+              </button>
+              <span class="flex-grow"></span>
+            }
             <button mat-raised-button color="primary" (click)="createFeedbackTemplate()">
               Add Template
             </button>

@@ -31,15 +31,16 @@ import {
   csvResultModalService,
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
-import { Subscription } from 'rxjs';
-import { FeedbackTemplateService } from 'src/app/api/services/feedback-template.service';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { FileDownloaderService } from '../file-downloader/file-downloader.service';
-import { isEqual } from 'lodash';
-import { LearningOutcomeCsvDownloadModalService } from './learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.service';
+import {Subscription} from 'rxjs';
+import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {FileDownloaderService} from '../file-downloader/file-downloader.service';
+import {isEqual} from 'lodash';
+import {NestedCsvDownloadModalService} from './nested-csv-download-modal/nested-csv-download-modal.service';
+import API_URL from 'src/app/config/constants/apiURL';
 
 @Component({
   selector: 'f-feedback-template-editor',
@@ -92,7 +93,7 @@ export class FeedbackTemplateEditorComponent
     private learningOutcomeService: LearningOutcomeService,
     private feedbackTemplateService: FeedbackTemplateService,
     private fileDownloaderService: FileDownloaderService,
-    private learningOutcomeCsvDownloadModalService: LearningOutcomeCsvDownloadModalService,
+    private nestedCsvDownloadModalService: NestedCsvDownloadModalService,
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
@@ -394,11 +395,15 @@ export class FeedbackTemplateEditorComponent
     );
   }
 
-  public uploadCsv(type: 'Learning Outcomes' | 'Feedback Templates') {
-    const url =
-      type === 'Learning Outcomes'
-        ? this.context.getOutcomeBatchUploadUrl()
-        : this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
+  public uploadCsv(type: 'Learning Outcomes' | 'Feedback Templates', byOutcome: boolean) {
+    let url: string;
+
+    if (type === 'Learning Outcomes') url = this.context.getOutcomeBatchUploadUrl();
+    else {
+      if (byOutcome) url = this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
+      else if (this.context) url = this.context.getFeedbackTemplateBatchUploadUrl();
+      else url = `${API_URL}/global/feedback_chips/csv`;
+    }
 
     this.csvUploadModal.show(
       `Upload ${type} as CSV`,
@@ -414,22 +419,27 @@ export class FeedbackTemplateEditorComponent
     );
   }
 
-  public downloadCsv(type: 'learning-outcomes' | 'feedback-templates') {
-    if (this.context instanceof Unit) {
-      this.learningOutcomeCsvDownloadModalService.show(this.context);
-      return;
+  public downloadCsv(type: 'Learning Outcomes' | 'Feedback Templates', byOutcome: boolean) {
+    let url: string;
+
+    if (type === 'Learning Outcomes') url = this.context.getOutcomeBatchUploadUrl();
+    else {
+      if (byOutcome) url = this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
+      else if (this.context) url = this.context.getFeedbackTemplateBatchUploadUrl();
+      else url = `${API_URL}/global/feedback_chips/csv`;
     }
 
-    let name: string = '';
-    if (type === 'feedback-templates') name = this.selectedOutcome.abbreviation;
-    else if (this.context instanceof TaskDefinition) name = this.context.abbreviation;
+    let name = `${type}.csv`;
 
-    const url =
-      type === 'learning-outcomes'
-        ? this.context.getOutcomeBatchUploadUrl()
-        : this.selectedOutcome.getFeedbackTemplateBatchUploadUrl();
+    if (type === 'Feedback Templates' && byOutcome)
+      name = `${this.selectedOutcome.abbreviation}-${name}`;
+    if (this.context instanceof TaskDefinition)
+      name = `${this.context.unit.code}-${this.context.abbreviation}-${name}`;
+    else if (this.context instanceof Unit) name = `${this.context.code}-${name}`;
 
-    this.fileDownloaderService.downloadFile(url, `${name}-${type}.csv`);
+    if (this.context instanceof Unit && !byOutcome)
+      this.nestedCsvDownloadModalService.show(url, name, type);
+    else this.fileDownloaderService.downloadFile(url, name);
   }
 
   public createLearningOutcome() {

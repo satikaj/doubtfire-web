@@ -240,8 +240,8 @@ import {ScormExtensionModalComponent} from './common/modals/scorm-extension-moda
 import {FeedbackTemplateService} from './api/services/feedback-template.service';
 import {FeedbackTemplateEditorComponent} from './common/feedback-template/feedback-template-editor.component';
 import {TaskFeedbackTemplatesComponent} from './tasks/task-comment-composer/task-feedback-templates/task-feedback-templates.component';
-import {LearningOutcomeCsvDownloadModalComponent} from './common/feedback-template/learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.component';
-import {LearningOutcomeCsvDownloadModalService} from './common/feedback-template/learning-outcome-csv-download-modal/learning-outcome-csv-download-modal.service';
+import {NestedCsvDownloadModalComponent} from './common/feedback-template/nested-csv-download-modal/nested-csv-download-modal.component';
+import {NestedCsvDownloadModalService} from './common/feedback-template/nested-csv-download-modal/nested-csv-download-modal.service';
 
 // See https://stackoverflow.com/questions/55721254/how-to-change-mat-datepicker-date-format-to-dd-mm-yyyy-in-simplest-way/58189036#58189036
 const MY_DATE_FORMAT = {
@@ -364,7 +364,7 @@ const MY_DATE_FORMAT = {
     ScormExtensionModalComponent,
     FeedbackTemplateEditorComponent,
     TaskFeedbackTemplatesComponent,
-    LearningOutcomeCsvDownloadModalComponent,
+    NestedCsvDownloadModalComponent,
   ],
   // Services we provide
   providers: [
@@ -444,7 +444,7 @@ const MY_DATE_FORMAT = {
       player: () => player,
     }),
     FeedbackTemplateService,
-    LearningOutcomeCsvDownloadModalService,
+    NestedCsvDownloadModalService,
   ],
   imports: [
     FlexLayoutModule,

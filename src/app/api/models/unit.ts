@@ -388,6 +388,10 @@ export class Unit extends Entity {
     return `${AppInjector.get(DoubtfireConstants).API_URL}/units/${this.id}/outcomes/csv`;
   }
 
+  public getFeedbackTemplateBatchUploadUrl(): string {
+    return `${AppInjector.get(DoubtfireConstants).API_URL}/units/${this.id}/feedback_chips/csv`;
+  }
+
   public hasStreams(): boolean {
     return this.tutorialStreamsCache.size > 1;
   }
