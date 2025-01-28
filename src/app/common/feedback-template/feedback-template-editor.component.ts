@@ -274,66 +274,93 @@ export class FeedbackTemplateEditorComponent
   }
 
   public sortTemplateData(sort: Sort) {
-
     sort.active = sort.active || 'chipText';
     sort.direction = sort.direction || 'asc';
 
     const isAsc = sort.direction === 'asc';
 
-    const parents = [...this.possibleParents];
-    const nonParents = this.templateSource.data.filter(
-      (template) => !this.possibleParents.includes(template)
-    );
+    // Generic sorting function for dynamic property access
+    const compare = (a: FeedbackTemplate, b: FeedbackTemplate) => {
+      const key = sort.active as keyof FeedbackTemplate;
+      const aValue = a[key];
+      const bValue = b[key];
 
-    // Sort parents first by the selected field
-    parents.sort((a, b) => {
-      switch (sort.active) {
-        case 'chipText':
-          return a.chipText.localeCompare(b.chipText) * (isAsc ? 1 : -1);
-        case 'description':
-          return a.description.localeCompare(b.description) * (isAsc ? 1 : -1);
-        case 'taskStatus':
-          return a.taskStatus.localeCompare(b.taskStatus) * (isAsc ? 1 : -1);
-        default:
-          return 0;
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return aValue.localeCompare(bValue) * (isAsc ? 1 : -1);
       }
-    });
+      return 0;
+    };
 
-    const groupedTemplates = new Map<number, FeedbackTemplate[]>();
-    nonParents.forEach((template) => {
-      const parentId = template.parentChipId;
-      if (!groupedTemplates.has(parentId)) {
-        groupedTemplates.set(parentId, []);
-      }
-      groupedTemplates.get(parentId)!.push(template);
-    });
+    console.log("Step 1: Initial sorting based on:", sort.active);
 
-    // Sort children within their parent groups
-    const finalSortedTemplates: FeedbackTemplate[] = [];
+    // Step 1: Initial sorting by the chosen method
+    const sortedTemplates = [...this.templateSource.data].sort(compare);
+    console.log("After Initial Sort:", sortedTemplates.map(t => `${t.type}: ${t.chipText} (ID: ${t.id}, Parent: ${t.parentChipId})`));
 
-    parents.forEach((parent) => {
-      finalSortedTemplates.push(parent); // Add parent first
+    // Step 2: Determine maximum depth of the hierarchy (only groups contribute to depth)
+    const depthMap = new Map<number, number>();
+    let maxDepth = 0;
 
-      // Get and sort children for this parent
-      const children = groupedTemplates.get(parent.id) ?? [];
-      children.sort((a, b) => {
-        switch (sort.active) {
-          case 'chipText':
-            return a.chipText.localeCompare(b.chipText) * (isAsc ? 1 : -1);
-          case 'description':
-            return a.description.localeCompare(b.description) * (isAsc ? 1 : -1);
-          case 'taskStatus':
-            return a.taskStatus.localeCompare(b.taskStatus) * (isAsc ? 1 : -1);
-          default:
-            return 0;
+    sortedTemplates.forEach((template) => {
+      if (template.type === 'group') {
+        let depth = 0;
+        let parentId = template.parentChipId;
+
+        while (parentId) {
+          depth++;
+          parentId = sortedTemplates.find(t => t.id === parentId)?.parentChipId ?? null;
         }
-      });
 
-      finalSortedTemplates.push(...children);
+        depthMap.set(template.id, depth);
+        maxDepth = Math.max(maxDepth, depth);
+      }
     });
 
-    // Replace the data source
-    this.templateSource.data = [...finalSortedTemplates];
+    console.log("Maximum Depth:", maxDepth);
+    console.log("Group Depth Mapping:", Array.from(depthMap.entries()));
+
+    // Step 3: Assign sequential order numbers
+    const orderMap = new Map<number, number>();
+    let orderIndex = 1;
+
+    sortedTemplates.forEach((template) => {
+      orderMap.set(template.id, orderIndex++);
+    });
+
+    console.log("Initial Sequential Order Numbers:", Array.from(orderMap.entries()));
+
+    // Step 4: Assign hierarchical order to groups **using depth-based multiplier**
+    sortedTemplates.forEach((template) => {
+      if (template.type === 'group') {
+        const parentOrder = template.parentChipId ? orderMap.get(template.parentChipId)! : 0;
+        const depth = depthMap.get(template.id) ?? 0;
+        const multiplier = 10 ** (maxDepth - depth + 1); // Proper scaling based on depth
+
+        orderMap.set(template.id, parentOrder + orderMap.get(template.id)! * multiplier);
+        console.log(`Group "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`);
+      }
+    });
+
+    console.log("Assigned Order for Groups:", Array.from(orderMap.entries()));
+
+    // Step 5: Assign order values to templates **by directly adding their parent's order**
+    sortedTemplates.forEach((template) => {
+      if (template.type !== 'group') {
+        const parentOrder = orderMap.get(template.parentChipId) ?? 0;
+        orderMap.set(template.id, parentOrder + orderMap.get(template.id)!);
+        console.log(`Template "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`);
+      }
+    });
+
+    console.log("Final Order Assignments:", Array.from(orderMap.entries()));
+
+    // Step 6: Sort again by computed hierarchical order
+    sortedTemplates.sort((a, b) => (orderMap.get(a.id)! - orderMap.get(b.id)!));
+
+    console.log("Final Sorted Order:", sortedTemplates.map(t => `${t.chipText} (Final Order: ${orderMap.get(t.id)})`));
+
+    // Step 7: Update the data source
+    this.templateSource.data = [...sortedTemplates];
   }
 
   public compare(a: number | string, b: number | string, isAsc: boolean): number {
