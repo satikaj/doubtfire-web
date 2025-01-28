@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.31](https://github.com/macite/doubtfire-deploy/compare/v8.0.30...v8.0.31) (2025-01-28)
+
+
+### Bug Fixes
+
+* ensure test attempt work for staff students ([06bfa71](https://github.com/macite/doubtfire-deploy/commit/06bfa714d0b54938231004a29ae11e68fe515d80))
+* serve index.html for unknown paths ([d07ad26](https://github.com/macite/doubtfire-deploy/commit/d07ad26bd7e7bd8ba7c7877a1208a8f82958c72b))
+
 ### [8.0.30](https://github.com/doubtfire-lms/doubtfire-deploy/compare/v8.0.29...v8.0.30) (2025-01-22)
 
 
