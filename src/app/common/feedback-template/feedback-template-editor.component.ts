@@ -31,15 +31,15 @@ import {
   csvResultModalService,
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
-import {Subscription} from 'rxjs';
-import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {MatChipInputEvent} from '@angular/material/chips';
-import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
-import {FileDownloaderService} from '../file-downloader/file-downloader.service';
-import {isEqual} from 'lodash';
-import {NestedCsvDownloadModalService} from './nested-csv-download-modal/nested-csv-download-modal.service';
+import { Subscription } from 'rxjs';
+import { FeedbackTemplateService } from 'src/app/api/services/feedback-template.service';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { FileDownloaderService } from '../file-downloader/file-downloader.service';
+import { isEqual } from 'lodash';
+import { NestedCsvDownloadModalService } from './nested-csv-download-modal/nested-csv-download-modal.service';
 import API_URL from 'src/app/config/constants/apiURL';
 
 @Component({
@@ -194,6 +194,7 @@ export class FeedbackTemplateEditorComponent
           data.description.toLowerCase().includes(filterValue)
         );
       };
+      this.sortTemplateData({ active: 'chipText', direction: 'asc' });
     });
   }
 
@@ -273,9 +274,9 @@ export class FeedbackTemplateEditorComponent
   }
 
   public sortTemplateData(sort: Sort) {
-    if (!sort.active || sort.direction === '') {
-      return;
-    }
+
+    sort.active = sort.active || 'chipText';
+    sort.direction = sort.direction || 'asc';
 
     const isAsc = sort.direction === 'asc';
 
