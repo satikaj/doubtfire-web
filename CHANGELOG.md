@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.33](https://github.com/macite/doubtfire-deploy/compare/v8.0.32...v8.0.33) (2025-01-29)
+
+
+### Bug Fixes
+
+* nginx conf redirect for spa ([95c0ca9](https://github.com/macite/doubtfire-deploy/commit/95c0ca9384e5a0fe7e522f61146b711b706712c1))
+
 ### [8.0.32](https://github.com/macite/doubtfire-deploy/compare/v8.0.31...v8.0.32) (2025-01-29)
 
 
