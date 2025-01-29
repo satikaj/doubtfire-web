@@ -1,5 +1,5 @@
 import {User, UserService} from 'src/app/api/models/doubtfire-model';
-import {Inject, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {DoubtfireConstants} from 'src/app/config/constants/doubtfire-constants';
 import {StateService, UIRouter, UIRouterGlobals} from '@uirouter/angular';
@@ -25,12 +25,20 @@ export class AuthenticationService {
   public checkUserCookie(): void {
     const userData = JSON.parse(localStorage.getItem(this.USERNAME_KEY));
 
-    // Get current user from the user service
-    const user = this.userService.cache.getOrCreate(userData.id, this.userService, userData);
+    // Exit if no user data
+    if (!userData || !userData.id) {
+      return;
+    }
 
-    if (userData && this.tryChangeUser(user)) {
-      // Ensure current user is in cache
-      this.userService.cache.add(user);
+    // Get current user from the user service - ensure the object exists there
+    const user = this.userService.cache.getOrCreate(userData.id, this.userService, {
+      username: userData.username,
+    });
+
+    // Merge in the cached data
+    Object.assign(user, userData);
+
+    if (this.tryChangeUser(user)) {
       this.userService.currentUser = user;
 
       const resetTime = new Date(
