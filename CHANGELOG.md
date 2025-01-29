@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.32](https://github.com/macite/doubtfire-deploy/compare/v8.0.31...v8.0.32) (2025-01-29)
+
+
+### Bug Fixes
+
+* correct issue fetching user from cookie ([0d63775](https://github.com/macite/doubtfire-deploy/commit/0d63775339dcbb648d7c8702b1c3428b8622a704))
+
 ### [8.0.31](https://github.com/macite/doubtfire-deploy/compare/v8.0.30...v8.0.31) (2025-01-28)
 
 
