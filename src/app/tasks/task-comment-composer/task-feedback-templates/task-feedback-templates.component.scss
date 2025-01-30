@@ -1,3 +1,27 @@
 .category-tab-group .mat-mdc-tab-header {
-  --mdc-secondary-navigation-tab-container-height: 35px !important;
+  --mdc-secondary-navigation-tab-container-height: 40px !important;
+}
+
+.template-search .mat-mdc-form-field-subscript-wrapper, .template-search .mat-mdc-form-field-bottom-align {
+  height: 0px !important;
+}
+
+.template-search .mat-mdc-text-field-wrapper, .template-search .mat-mdc-form-field {
+  height: 40px !important;
+}
+
+.template-search .mat-mdc-form-field-infix {
+  min-height: 40px !important;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+.template-search .mat-mdc-input-element {
+  font-size: 14px !important;
+  padding-top: 3px !important;
+}
+
+.template-search .material-icons {
+  font-size: 19px !important;
+  padding-top: 5px !important;
 }
