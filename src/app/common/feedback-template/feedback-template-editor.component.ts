@@ -23,6 +23,7 @@ import {
   LearningOutcome,
   LearningOutcomeService,
   FeedbackTemplate,
+  TaskService,
 } from 'src/app/api/models/doubtfire-model';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {MatSort, Sort} from '@angular/material/sort';
@@ -95,6 +96,7 @@ export class FeedbackTemplateEditorComponent
     private feedbackTemplateService: FeedbackTemplateService,
     private fileDownloaderService: FileDownloaderService,
     private nestedCsvDownloadModalService: NestedCsvDownloadModalService,
+    private taskService: TaskService,
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
