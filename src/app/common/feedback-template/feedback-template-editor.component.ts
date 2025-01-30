@@ -24,6 +24,7 @@ import {
   LearningOutcomeService,
   FeedbackTemplate,
   TaskService,
+  FeedbackTemplateService,
 } from 'src/app/api/models/doubtfire-model';
 import {AlertService} from 'src/app/common/services/alert.service';
 import {MatSort, Sort} from '@angular/material/sort';
@@ -33,7 +34,6 @@ import {
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
 import {Subscription} from 'rxjs';
-import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {LiveAnnouncer} from '@angular/cdk/a11y';
 import {MatChipInputEvent} from '@angular/material/chips';

@@ -25,6 +25,11 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            [ngStyle]="
+              template.taskStatus
+                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
+                : {}
+            "
           >
             {{ template.chipText }}
           </mat-chip>
@@ -42,6 +47,11 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            [ngStyle]="
+              template.taskStatus
+                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
+                : {}
+            "
           >
             {{ template.chipText }}
           </mat-chip>
@@ -59,6 +69,11 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            [ngStyle]="
+              template.taskStatus
+                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
+                : {}
+            "
           >
             {{ template.chipText }}
           </mat-chip>

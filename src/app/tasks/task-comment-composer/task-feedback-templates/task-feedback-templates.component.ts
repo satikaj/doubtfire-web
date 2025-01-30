@@ -10,9 +10,14 @@ import {
   EventEmitter,
 } from '@angular/core';
 import {BehaviorSubject, combineLatest, map, Observable} from 'rxjs';
-import {LearningOutcome, FeedbackTemplate, Task} from 'src/app/api/models/doubtfire-model';
-import {FeedbackTemplateService} from 'src/app/api/services/feedback-template.service';
-import {LearningOutcomeService} from 'src/app/api/services/learning-outcome.service';
+import {
+  LearningOutcome,
+  FeedbackTemplate,
+  Task,
+  FeedbackTemplateService,
+  LearningOutcomeService,
+  TaskService,
+} from 'src/app/api/models/doubtfire-model';
 
 @Component({
   selector: 'f-task-feedback-templates',
@@ -62,6 +67,7 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
   constructor(
     private learningOutcomeService: LearningOutcomeService,
     private feedbackTemplateService: FeedbackTemplateService,
+    private taskService: TaskService,
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
