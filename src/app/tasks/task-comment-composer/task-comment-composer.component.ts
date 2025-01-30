@@ -340,6 +340,11 @@ export class TaskCommentComposerComponent implements DoCheck, OnChanges {
       },
     );
   }
+
+  showFeedbackPicker() {
+    this.showFeedbackTemplatePicker = !this.showFeedbackTemplatePicker;
+    this.commentsViewer.scrollDown();
+  }
 }
 
 // The discussion prompt composer dialog Component
