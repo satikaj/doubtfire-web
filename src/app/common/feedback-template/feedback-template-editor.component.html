@@ -254,7 +254,7 @@
                 *matCellDef="let feedbackTemplate"
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
-                {{ feedbackTemplate.type === 'group' ? '' : feedbackTemplate.commentText }}
+                {{ feedbackTemplate.commentText }}
               </td>
             </ng-container>
             <ng-container matColumnDef="summaryText" sticky>
@@ -264,7 +264,7 @@
                 *matCellDef="let feedbackTemplate"
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
-                {{ feedbackTemplate.summaryText }}
+                {{ feedbackTemplate.type === 'group' ? '' : feedbackTemplate.summaryText }}
               </td>
             </ng-container>
             <ng-container matColumnDef="taskStatus" sticky>
