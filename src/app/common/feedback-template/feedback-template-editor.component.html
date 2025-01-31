@@ -275,11 +275,10 @@
                 (click)="selectFeedbackTemplate(feedbackTemplate)"
               >
                 @if (feedbackTemplate.taskStatus) {
-                  <mat-chip
-                    [ngStyle]="{
-                      'background-color': taskService.statusColors.get(feedbackTemplate.taskStatus)
-                    }"
-                  >
+                  <mat-chip>
+                    <i
+                      class="fa {{ taskService.statusData(feedbackTemplate.taskStatus).icon }}"
+                    ></i>
                     {{ taskService.statusData(feedbackTemplate.taskStatus).label }}
                   </mat-chip>
                 }
