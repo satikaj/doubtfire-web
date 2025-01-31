@@ -25,12 +25,15 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-            [ngStyle]="
-              template.taskStatus
-                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
-                : {}
-            "
+            [ngStyle]="isTemplateSelected(template) ? {'border': '1px solid'} : {}"
           >
+            <mat-icon *ngIf="isTemplateSelected(template)" matChipAvatar>check_circle</mat-icon>
+            <i
+              *ngIf="!isTemplateSelected(template) && template.taskStatus"
+              class="fa {{ taskService.statusData(template.taskStatus).icon }}"
+              matChipAvatar
+            ></i>
+            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
             {{ template.chipText }}
           </mat-chip>
         </div>
@@ -47,12 +50,15 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-            [ngStyle]="
-              template.taskStatus
-                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
-                : {}
-            "
+            [ngStyle]="isTemplateSelected(template) ? {'border': '1px solid'} : {}"
           >
+            <mat-icon *ngIf="isTemplateSelected(template)" matChipAvatar>check_circle</mat-icon>
+            <i
+              *ngIf="!isTemplateSelected(template) && template.taskStatus"
+              class="fa {{ taskService.statusData(template.taskStatus).icon }}"
+              matChipAvatar
+            ></i>
+            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
             {{ template.chipText }}
           </mat-chip>
         </div>
@@ -69,12 +75,15 @@
             (mouseleave)="onHoverTemplate(null)"
             (click)="selectTemplate(template)"
             class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
-            [ngStyle]="
-              template.taskStatus
-                ? {'background-color': taskService.statusColors.get(template.taskStatus)}
-                : {}
-            "
+            [ngStyle]="isTemplateSelected(template) ? {'border': '1px solid'} : {}"
           >
+            <mat-icon *ngIf="isTemplateSelected(template)" matChipAvatar>check_circle</mat-icon>
+            <i
+              *ngIf="!isTemplateSelected(template) && template.taskStatus"
+              class="fa {{ taskService.statusData(template.taskStatus).icon }}"
+              matChipAvatar
+            ></i>
+            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
             {{ template.chipText }}
           </mat-chip>
         </div>

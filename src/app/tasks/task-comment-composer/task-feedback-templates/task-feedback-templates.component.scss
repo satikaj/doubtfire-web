@@ -1,27 +1,31 @@
 .category-tab-group .mat-mdc-tab-header {
-  --mdc-secondary-navigation-tab-container-height: 40px !important;
+  --mdc-secondary-navigation-tab-container-height: 40px;
 }
 
-.template-search .mat-mdc-form-field-subscript-wrapper, .template-search .mat-mdc-form-field-bottom-align {
-  height: 0px !important;
+.template-search .mat-mdc-form-field-subscript-wrapper.mat-mdc-form-field-bottom-align {
+  height: 0px;
 }
 
 .template-search .mat-mdc-text-field-wrapper, .template-search .mat-mdc-form-field {
-  height: 40px !important;
+  height: 40px;
 }
 
 .template-search .mat-mdc-form-field-infix {
-  min-height: 40px !important;
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
+  min-height: 40px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .template-search .mat-mdc-input-element {
-  font-size: 14px !important;
-  padding-top: 3px !important;
+  font-size: 14px;
+  padding-top: 3px;
 }
 
 .template-search .material-icons {
-  font-size: 19px !important;
-  padding-top: 5px !important;
+  font-size: 19px;
+  padding-top: 5px;
+}
+
+.template-grid .mdc-evolution-chip__graphic.mat-mdc-chip-graphic.ng-star-inserted {
+  padding-right: 2px;
 }

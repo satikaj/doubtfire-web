@@ -29,7 +29,6 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
   @Input() task: Task;
   @Output() templateSelected = new EventEmitter<FeedbackTemplate>();
   categories = ['TLO', 'ULO', 'GLO'];
-  hoveredTemplate: FeedbackTemplate;
 
   public tlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
   public ulos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
@@ -143,9 +142,20 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
     }
   }
 
+  selectedTemplates: FeedbackTemplate[] = [];
+
   selectTemplate(template: FeedbackTemplate) {
-    this.templateSelected.emit(template);
+    if (template.type === 'template') {
+      this.selectedTemplates.push(template);
+      this.templateSelected.emit(template);
+    }
   }
+
+  isTemplateSelected(template: FeedbackTemplate): boolean {
+    return this.selectedTemplates.includes(template);
+  }
+
+  hoveredTemplate: FeedbackTemplate;
 
   onHoverTemplate(template: FeedbackTemplate) {
     this.hoveredTemplate = template;
