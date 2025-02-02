@@ -16,7 +16,7 @@
 
   <div class="overflow-y-auto flex-grow pr-4 pl-4 pb-5 pt-0">
     <div #tloSection class="template-category mt-2 mb-2">
-      <div *ngFor="let item of filteredTlos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of tlos$ | async" class="outcome-section mt-4">
         <h5 class="text-formatif-blue font-extrabold">
           {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
         </h5>
@@ -35,7 +35,12 @@
               class="fa {{ taskService.statusData(template.taskStatus).icon }}"
               matChipAvatar
             ></i>
-            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
+            <mat-icon *ngIf="template.type === 'group' && !isGroupExpanded(template)" matChipAvatar
+              >folder</mat-icon
+            >
+            <mat-icon *ngIf="template.type === 'group' && isGroupExpanded(template)" matChipAvatar
+              >chevron_right</mat-icon
+            >
             {{ template.chipText }}
           </mat-chip>
         </div>
@@ -43,7 +48,7 @@
     </div>
 
     <div #uloSection class="template-category mt-2 mb-2">
-      <div *ngFor="let item of filteredUlos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of ulos$ | async" class="outcome-section mt-4">
         <h5 class="text-formatif-blue font-extrabold">
           {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
         </h5>
@@ -62,7 +67,12 @@
               class="fa {{ taskService.statusData(template.taskStatus).icon }}"
               matChipAvatar
             ></i>
-            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
+            <mat-icon *ngIf="template.type === 'group' && !isGroupExpanded(template)" matChipAvatar
+              >folder</mat-icon
+            >
+            <mat-icon *ngIf="template.type === 'group' && isGroupExpanded(template)" matChipAvatar
+              >chevron_right</mat-icon
+            >
             {{ template.chipText }}
           </mat-chip>
         </div>
@@ -70,7 +80,7 @@
     </div>
 
     <div #gloSection class="template-category mt-2 mb-2">
-      <div *ngFor="let item of filteredGlos$ | async" class="outcome-section mt-4">
+      <div *ngFor="let item of glos$ | async" class="outcome-section mt-4">
         <h5 class="text-formatif-blue font-extrabold">
           {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
         </h5>
@@ -89,7 +99,12 @@
               class="fa {{ taskService.statusData(template.taskStatus).icon }}"
               matChipAvatar
             ></i>
-            <mat-icon *ngIf="template.type === 'group'" matChipAvatar>folder</mat-icon>
+            <mat-icon *ngIf="template.type === 'group' && !isGroupExpanded(template)" matChipAvatar
+              >folder</mat-icon
+            >
+            <mat-icon *ngIf="template.type === 'group' && isGroupExpanded(template)" matChipAvatar
+              >chevron_right</mat-icon
+            >
             {{ template.chipText }}
           </mat-chip>
         </div>

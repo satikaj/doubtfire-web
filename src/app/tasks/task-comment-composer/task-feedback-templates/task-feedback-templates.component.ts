@@ -28,36 +28,33 @@ import {
 export class TaskFeedbackTemplatesComponent implements OnChanges {
   @Input() task: Task;
   @Output() templateSelected = new EventEmitter<FeedbackTemplate>();
+
   categories = ['TLO', 'ULO', 'GLO'];
+  selectedTemplates: FeedbackTemplate[] = [];
+  hoveredTemplate: FeedbackTemplate;
+
+  private navigationStackSubject = new BehaviorSubject<Map<number, number[]>>(
+    new Map<number, number[]>(),
+  );
+  navigationStack$ = this.navigationStackSubject.asObservable();
+
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
 
   public tlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
   public ulos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
   public glos$ = combineLatest([
     this.learningOutcomeService.cache.values,
     this.feedbackTemplateService.cache.values,
+    this.navigationStack$,
+    this.searchTerm$,
   ]).pipe(
-    map(([outcomes, templates]) =>
+    map(([outcomes, templates, navigationStack, searchTerm]) =>
       outcomes
         .filter((outcome) => outcome.contextType === null)
         .map((outcome) => ({
           outcome: outcome,
-          templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
-        })),
-    ),
-  );
-
-  private searchTermSubject = new BehaviorSubject<string>('');
-  searchTerm$ = this.searchTermSubject.asObservable();
-  public filteredTlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
-  public filteredUlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
-  public filteredGlos$ = combineLatest([this.glos$, this.searchTerm$]).pipe(
-    map(([glos, searchTerm]) =>
-      glos
-        .map((glo) => ({
-          ...glo,
-          templates: glo.templates.filter((template) =>
-            template.chipText.toLowerCase().includes(searchTerm.toLowerCase()),
-          ),
+          templates: this.getTemplatesToDisplay(outcome.id, templates, navigationStack, searchTerm),
         }))
         .filter((glo) => glo.templates.length > 0),
     ),
@@ -74,22 +71,18 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
       this.tlos$ = combineLatest([
         this.task.definition.learningOutcomesCache.values,
         this.feedbackTemplateService.cache.values,
+        this.navigationStack$,
+        this.searchTerm$,
       ]).pipe(
-        map(([outcomes, templates]) =>
-          outcomes.map((outcome) => ({
-            outcome: outcome,
-            templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
-          })),
-        ),
-      );
-
-      this.filteredTlos$ = combineLatest([this.tlos$, this.searchTerm$]).pipe(
-        map(([tlos, searchTerm]) =>
-          tlos
-            .map((tlo) => ({
-              ...tlo,
-              templates: tlo.templates.filter((template) =>
-                template.chipText.toLowerCase().includes(searchTerm.toLowerCase()),
+        map(([outcomes, templates, navigationStack, searchTerm]) =>
+          outcomes
+            .map((outcome) => ({
+              outcome: outcome,
+              templates: this.getTemplatesToDisplay(
+                outcome.id,
+                templates,
+                navigationStack,
+                searchTerm,
               ),
             }))
             .filter((tlo) => tlo.templates.length > 0),
@@ -101,28 +94,52 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
       this.ulos$ = combineLatest([
         this.task.unit.learningOutcomesCache.values,
         this.feedbackTemplateService.cache.values,
+        this.navigationStack$,
+        this.searchTerm$,
       ]).pipe(
-        map(([outcomes, templates]) =>
-          outcomes.map((outcome) => ({
-            outcome: outcome,
-            templates: templates.filter((template) => template.learningOutcomeId === outcome.id),
-          })),
-        ),
-      );
-
-      this.filteredUlos$ = combineLatest([this.ulos$, this.searchTerm$]).pipe(
-        map(([ulos, searchTerm]) =>
-          ulos
-            .map((ulo) => ({
-              ...ulo,
-              templates: ulo.templates.filter((template) =>
-                template.chipText.toLowerCase().includes(searchTerm.toLowerCase()),
+        map(([outcomes, templates, navigationStack, searchTerm]) =>
+          outcomes
+            .map((outcome) => ({
+              outcome: outcome,
+              templates: this.getTemplatesToDisplay(
+                outcome.id,
+                templates,
+                navigationStack,
+                searchTerm,
               ),
             }))
             .filter((ulo) => ulo.templates.length > 0),
         ),
       );
     }
+  }
+
+  private getTemplatesToDisplay(
+    outcomeId: number,
+    templates: FeedbackTemplate[],
+    navigationStack: Map<number, number[]>,
+    searchTerm: string,
+  ): FeedbackTemplate[] {
+    const allTemplates = templates.filter((template) => template.learningOutcomeId === outcomeId);
+    let templatesToDisplay: FeedbackTemplate[] = [];
+
+    if (navigationStack.get(outcomeId) && navigationStack.get(outcomeId).length > 0) {
+      const outcomeStack = navigationStack.get(outcomeId);
+      const groupId = outcomeStack[outcomeStack.length - 1];
+
+      templatesToDisplay.push(allTemplates.find((template) => template.id === groupId));
+      allTemplates.forEach((template) => {
+        if (template.parentChipId === groupId) templatesToDisplay.push(template);
+      });
+    } else {
+      templatesToDisplay = allTemplates.filter((template) => !template.parentChipId);
+    }
+
+    templatesToDisplay = templatesToDisplay.filter((template) =>
+      template.chipText.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+
+    return templatesToDisplay;
   }
 
   onSearchTermChange(searchTerm: string): void {
@@ -142,12 +159,18 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
     }
   }
 
-  selectedTemplates: FeedbackTemplate[] = [];
-
   selectTemplate(template: FeedbackTemplate) {
     if (template.type === 'template') {
       this.selectedTemplates.push(template);
       this.templateSelected.emit(template);
+    } else {
+      const updatedStack = new Map(this.navigationStackSubject.getValue());
+      const outcomeStack = updatedStack.get(template.learningOutcomeId) || [];
+      const index = outcomeStack.indexOf(template.id);
+      if (index === -1) outcomeStack.push(template.id);
+      else outcomeStack.splice(index, 1);
+      updatedStack.set(template.learningOutcomeId, outcomeStack);
+      this.navigationStackSubject.next(updatedStack);
     }
   }
 
@@ -155,7 +178,13 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
     return this.selectedTemplates.includes(template);
   }
 
-  hoveredTemplate: FeedbackTemplate;
+  isGroupExpanded(template: FeedbackTemplate): boolean {
+    const stack = this.navigationStackSubject.getValue();
+    const outcomeStack = stack.get(template.learningOutcomeId) || [];
+    const index = outcomeStack.indexOf(template.id);
+    if (index === -1) return false;
+    else return true;
+  }
 
   onHoverTemplate(template: FeedbackTemplate) {
     this.hoveredTemplate = template;
