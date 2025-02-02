@@ -163,6 +163,7 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
     if (template.type === 'template') {
       this.selectedTemplates.push(template);
       this.templateSelected.emit(template);
+      this.suggestTaskStatus(template);
     } else {
       const updatedStack = new Map(this.navigationStackSubject.getValue());
       const outcomeStack = updatedStack.get(template.learningOutcomeId) || [];
@@ -188,5 +189,15 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
 
   onHoverTemplate(template: FeedbackTemplate) {
     this.hoveredTemplate = template;
+  }
+
+  private suggestTaskStatus(template: FeedbackTemplate) {
+    if (this.task.suggestedTaskStatus) {
+      const currentSeq = this.taskService.statusSeq.get(this.task.suggestedTaskStatus);
+      const templateSeq = this.taskService.statusSeq.get(template.taskStatus);
+      if (templateSeq < currentSeq) this.task.suggestedTaskStatus = template.taskStatus;
+    } else {
+      this.task.suggestedTaskStatus = template.taskStatus;
+    }
   }
 }
