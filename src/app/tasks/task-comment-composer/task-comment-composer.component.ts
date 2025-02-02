@@ -167,7 +167,6 @@ export class TaskCommentComposerComponent implements DoCheck, OnChanges {
     e.preventDefault();
     this.emojiSearchMode = false;
     this.showEmojiPicker = false;
-    this.showFeedbackTemplatePicker = false;
     if (this.input.first.nativeElement.innerText.trim() !== '') {
       this.addComment();
     }
@@ -264,6 +263,7 @@ export class TaskCommentComposerComponent implements DoCheck, OnChanges {
       char,
       text.slice(position),
     ].join('');
+    this.input.first.nativeElement.focus();
   }
 
   openDiscussionComposer() {
@@ -339,6 +339,11 @@ export class TaskCommentComposerComponent implements DoCheck, OnChanges {
         this.alerts.error(error || error?.message, 2000);
       },
     );
+  }
+
+  showFeedbackPicker() {
+    this.showFeedbackTemplatePicker = !this.showFeedbackTemplatePicker;
+    this.commentsViewer.scrollDown();
   }
 }
 

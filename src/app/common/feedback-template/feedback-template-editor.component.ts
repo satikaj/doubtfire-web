@@ -23,6 +23,8 @@ import {
   LearningOutcome,
   LearningOutcomeService,
   FeedbackTemplate,
+  TaskService,
+  FeedbackTemplateService,
 } from 'src/app/api/models/doubtfire-model';
 import { AlertService } from 'src/app/common/services/alert.service';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -31,15 +33,14 @@ import {
   csvResultModalService,
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
-import { Subscription } from 'rxjs';
-import { FeedbackTemplateService } from 'src/app/api/services/feedback-template.service';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { FileDownloaderService } from '../file-downloader/file-downloader.service';
-import { isEqual } from 'lodash';
-import { NestedCsvDownloadModalService } from './nested-csv-download-modal/nested-csv-download-modal.service';
+import {Subscription} from 'rxjs';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {FileDownloaderService} from '../file-downloader/file-downloader.service';
+import {isEqual} from 'lodash';
+import {NestedCsvDownloadModalService} from './nested-csv-download-modal/nested-csv-download-modal.service';
 import API_URL from 'src/app/config/constants/apiURL';
 
 @Component({
@@ -94,6 +95,7 @@ export class FeedbackTemplateEditorComponent
     private feedbackTemplateService: FeedbackTemplateService,
     private fileDownloaderService: FileDownloaderService,
     private nestedCsvDownloadModalService: NestedCsvDownloadModalService,
+    private taskService: TaskService,
     @Inject(csvResultModalService) private csvResultModalService: any,
     @Inject(csvUploadModalService) private csvUploadModal: any,
     @Inject(confirmationModal) private confirmationModal: any,
