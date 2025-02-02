@@ -14,9 +14,9 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
+import {MatTable, MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSelectChange} from '@angular/material/select';
 import {
   TaskDefinition,
   Unit,
@@ -26,8 +26,8 @@ import {
   TaskService,
   FeedbackTemplateService,
 } from 'src/app/api/models/doubtfire-model';
-import { AlertService } from 'src/app/common/services/alert.service';
-import { MatSort, Sort } from '@angular/material/sort';
+import {AlertService} from 'src/app/common/services/alert.service';
+import {MatSort, Sort} from '@angular/material/sort';
 import {
   confirmationModal,
   csvResultModalService,
@@ -48,12 +48,13 @@ import API_URL from 'src/app/config/constants/apiURL';
   templateUrl: 'feedback-template-editor.component.html',
 })
 export class FeedbackTemplateEditorComponent
-  implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
   @Input() context?: TaskDefinition | Unit;
 
-  @ViewChild('outcomeTable', { static: false }) outcomeTable: MatTable<LearningOutcome>;
-  @ViewChild(MatSort, { static: false }) outcomeSort: MatSort;
-  @ViewChild('outcomePaginator', { static: false }) outcomePaginator: MatPaginator;
+  @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
+  @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
+  @ViewChild('outcomePaginator', {static: false}) outcomePaginator: MatPaginator;
 
   public outcomeSource: MatTableDataSource<LearningOutcome>;
   public outcomeColumns: string[] = [
@@ -69,9 +70,9 @@ export class FeedbackTemplateEditorComponent
   public allOutcomes: LearningOutcome[] = [];
   public selectedConnectedOutcomes = signal([]);
 
-  @ViewChild('templateTable', { static: false }) templateTable: MatTable<FeedbackTemplate>;
-  @ViewChild(MatSort, { static: false }) templateSort: MatSort;
-  @ViewChild('templatePaginator', { static: false }) templatePaginator: MatPaginator;
+  @ViewChild('templateTable', {static: false}) templateTable: MatTable<FeedbackTemplate>;
+  @ViewChild(MatSort, {static: false}) templateSort: MatSort;
+  @ViewChild('templatePaginator', {static: false}) templatePaginator: MatPaginator;
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
@@ -196,7 +197,7 @@ export class FeedbackTemplateEditorComponent
           data.description.toLowerCase().includes(filterValue)
         );
       };
-      this.sortTemplateData({ active: 'chipText', direction: 'asc' });
+      this.sortTemplateData({active: 'chipText', direction: 'asc'});
     });
   }
 
@@ -293,11 +294,16 @@ export class FeedbackTemplateEditorComponent
       return 0;
     };
 
-    console.log("Step 1: Initial sorting based on:", sort.active);
+    // console.log('Step 1: Initial sorting based on:', sort.active);
 
     // Step 1: Initial sorting by the chosen method
     const sortedTemplates = [...this.templateSource.data].sort(compare);
-    console.log("After Initial Sort:", sortedTemplates.map(t => `${t.type}: ${t.chipText} (ID: ${t.id}, Parent: ${t.parentChipId})`));
+    // console.log(
+    //   'After Initial Sort:',
+    //   sortedTemplates.map(
+    //     (t) => `${t.type}: ${t.chipText} (ID: ${t.id}, Parent: ${t.parentChipId})`,
+    //   ),
+    // );
 
     // Step 2: Determine maximum depth of the hierarchy (only groups contribute to depth)
     const depthMap = new Map<number, number>();
@@ -310,7 +316,7 @@ export class FeedbackTemplateEditorComponent
 
         while (parentId) {
           depth++;
-          parentId = sortedTemplates.find(t => t.id === parentId)?.parentChipId ?? null;
+          parentId = sortedTemplates.find((t) => t.id === parentId)?.parentChipId ?? null;
         }
 
         depthMap.set(template.id, depth);
@@ -318,8 +324,8 @@ export class FeedbackTemplateEditorComponent
       }
     });
 
-    console.log("Maximum Depth:", maxDepth);
-    console.log("Group Depth Mapping:", Array.from(depthMap.entries()));
+    // console.log('Maximum Depth:', maxDepth);
+    // console.log('Group Depth Mapping:', Array.from(depthMap.entries()));
 
     // Step 3: Assign sequential order numbers
     const orderMap = new Map<number, number>();
@@ -329,7 +335,7 @@ export class FeedbackTemplateEditorComponent
       orderMap.set(template.id, orderIndex++);
     });
 
-    console.log("Initial Sequential Order Numbers:", Array.from(orderMap.entries()));
+    // console.log('Initial Sequential Order Numbers:', Array.from(orderMap.entries()));
 
     // Step 4: Assign hierarchical order to groups **using depth-based multiplier**
     sortedTemplates.forEach((template) => {
@@ -339,27 +345,34 @@ export class FeedbackTemplateEditorComponent
         const multiplier = 10 ** (maxDepth - depth + 1); // Proper scaling based on depth
 
         orderMap.set(template.id, parentOrder + orderMap.get(template.id)! * multiplier);
-        console.log(`Group "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`);
+        // console.log(
+        //   `Group "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`,
+        // );
       }
     });
 
-    console.log("Assigned Order for Groups:", Array.from(orderMap.entries()));
+    // console.log('Assigned Order for Groups:', Array.from(orderMap.entries()));
 
     // Step 5: Assign order values to templates **by directly adding their parent's order**
     sortedTemplates.forEach((template) => {
       if (template.type !== 'group') {
         const parentOrder = orderMap.get(template.parentChipId) ?? 0;
         orderMap.set(template.id, parentOrder + orderMap.get(template.id)!);
-        console.log(`Template "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`);
+        // console.log(
+        //   `Template "${template.chipText}" (ID: ${template.id}) -> Computed Order: ${orderMap.get(template.id)}`,
+        // );
       }
     });
 
-    console.log("Final Order Assignments:", Array.from(orderMap.entries()));
+    // console.log('Final Order Assignments:', Array.from(orderMap.entries()));
 
     // Step 6: Sort again by computed hierarchical order
-    sortedTemplates.sort((a, b) => (orderMap.get(a.id)! - orderMap.get(b.id)!));
+    sortedTemplates.sort((a, b) => orderMap.get(a.id)! - orderMap.get(b.id)!);
 
-    console.log("Final Sorted Order:", sortedTemplates.map(t => `${t.chipText} (Final Order: ${orderMap.get(t.id)})`));
+    // console.log(
+    //   'Final Sorted Order:',
+    //   sortedTemplates.map((t) => `${t.chipText} (Final Order: ${orderMap.get(t.id)})`),
+    // );
 
     // Step 7: Update the data source
     this.templateSource.data = [...sortedTemplates];
@@ -438,7 +451,7 @@ export class FeedbackTemplateEditorComponent
     this.csvUploadModal.show(
       `Upload ${type} as CSV`,
       'Test message',
-      { file: { name: `${type} CSV Data`, type: 'csv' } },
+      {file: {name: `${type} CSV Data`, type: 'csv'}},
       url,
       (response: any) => {
         this.csvResultModalService.show(`${type} CSV Upload Results`, response);
