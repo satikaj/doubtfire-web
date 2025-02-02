@@ -17,7 +17,9 @@
   <div class="overflow-y-auto flex-grow pr-4 pl-4 pb-5 pt-0">
     <div #tloSection class="template-category mt-2 mb-2">
       <div *ngFor="let item of filteredTlos$ | async" class="outcome-section mt-4">
-        <h5 class="text-formatif-blue font-extrabold">{{ item.outcome.abbreviation }}</h5>
+        <h5 class="text-formatif-blue font-extrabold">
+          {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
+        </h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
             *ngFor="let template of item.templates"
@@ -42,7 +44,9 @@
 
     <div #uloSection class="template-category mt-2 mb-2">
       <div *ngFor="let item of filteredUlos$ | async" class="outcome-section mt-4">
-        <h5 class="text-formatif-blue font-extrabold">{{ item.outcome.abbreviation }}</h5>
+        <h5 class="text-formatif-blue font-extrabold">
+          {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
+        </h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
             *ngFor="let template of item.templates"
@@ -67,7 +71,9 @@
 
     <div #gloSection class="template-category mt-2 mb-2">
       <div *ngFor="let item of filteredGlos$ | async" class="outcome-section mt-4">
-        <h5 class="text-formatif-blue font-extrabold">{{ item.outcome.abbreviation }}</h5>
+        <h5 class="text-formatif-blue font-extrabold">
+          {{ item.outcome.abbreviation }} - {{ item.outcome.shortDescription }}
+        </h5>
         <div class="template-grid flex flex-wrap gap-1.5 mt-1">
           <mat-chip
             *ngFor="let template of item.templates"
