@@ -14,9 +14,9 @@ import {
   OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSelectChange } from '@angular/material/select';
+import {MatTable, MatTableDataSource} from '@angular/material/table';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatSelectChange} from '@angular/material/select';
 import {
   TaskDefinition,
   Unit,
@@ -26,21 +26,21 @@ import {
   TaskService,
   FeedbackTemplateService,
 } from 'src/app/api/models/doubtfire-model';
-import { AlertService } from 'src/app/common/services/alert.service';
-import { MatSort, Sort } from '@angular/material/sort';
+import {AlertService} from 'src/app/common/services/alert.service';
+import {MatSort, Sort} from '@angular/material/sort';
 import {
   confirmationModal,
   csvResultModalService,
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
-import { Subscription } from 'rxjs';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { MatChipInputEvent } from '@angular/material/chips';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { FileDownloaderService } from '../file-downloader/file-downloader.service';
-import { isEqual } from 'lodash';
-import { NestedCsvDownloadModalService } from './nested-csv-download-modal/nested-csv-download-modal.service';
+import {Subscription} from 'rxjs';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {LiveAnnouncer} from '@angular/cdk/a11y';
+import {MatChipInputEvent} from '@angular/material/chips';
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
+import {FileDownloaderService} from '../file-downloader/file-downloader.service';
+import {isEqual} from 'lodash';
+import {NestedCsvDownloadModalService} from './nested-csv-download-modal/nested-csv-download-modal.service';
 import API_URL from 'src/app/config/constants/apiURL';
 
 @Component({
@@ -48,12 +48,13 @@ import API_URL from 'src/app/config/constants/apiURL';
   templateUrl: 'feedback-template-editor.component.html',
 })
 export class FeedbackTemplateEditorComponent
-  implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
+{
   @Input() context?: TaskDefinition | Unit;
 
-  @ViewChild('outcomeTable', { static: false }) outcomeTable: MatTable<LearningOutcome>;
-  @ViewChild(MatSort, { static: false }) outcomeSort: MatSort;
-  @ViewChild('outcomePaginator', { static: false }) outcomePaginator: MatPaginator;
+  @ViewChild('outcomeTable', {static: false}) outcomeTable: MatTable<LearningOutcome>;
+  @ViewChild(MatSort, {static: false}) outcomeSort: MatSort;
+  @ViewChild('outcomePaginator', {static: false}) outcomePaginator: MatPaginator;
 
   public outcomeSource: MatTableDataSource<LearningOutcome>;
   public outcomeColumns: string[] = [
@@ -69,9 +70,9 @@ export class FeedbackTemplateEditorComponent
   public allOutcomes: LearningOutcome[] = [];
   public selectedConnectedOutcomes = signal([]);
 
-  @ViewChild('templateTable', { static: false }) templateTable: MatTable<FeedbackTemplate>;
-  @ViewChild(MatSort, { static: false }) templateSort: MatSort;
-  @ViewChild('templatePaginator', { static: false }) templatePaginator: MatPaginator;
+  @ViewChild('templateTable', {static: false}) templateTable: MatTable<FeedbackTemplate>;
+  @ViewChild(MatSort, {static: false}) templateSort: MatSort;
+  @ViewChild('templatePaginator', {static: false}) templatePaginator: MatPaginator;
 
   public templateSource: MatTableDataSource<FeedbackTemplate>;
   public templateColumns: string[] = [
@@ -196,7 +197,7 @@ export class FeedbackTemplateEditorComponent
           data.description.toLowerCase().includes(filterValue)
         );
       };
-      this.sortTemplateData({ active: 'chipText', direction: 'asc' });
+      this.sortTemplateData({active: 'chipText', direction: 'asc'});
     });
   }
 
@@ -304,8 +305,6 @@ export class FeedbackTemplateEditorComponent
     const feedbackGroups = sortedTemplates.filter(t => t.type === 'group');
     const feedbackTemplates = sortedTemplates.filter(t => t.type !== 'group');
 
-
-
     feedbackGroups.forEach((template) => {
       let depth = 0;
       let parentId = template.parentChipId;
@@ -318,7 +317,6 @@ export class FeedbackTemplateEditorComponent
       depthMap.set(template.id, depth);
       maxDepth = Math.max(maxDepth, depth);
     });
-
 
     // Assign sequential order numbers
     const orderMap = new Map<number, number>();
@@ -344,7 +342,6 @@ export class FeedbackTemplateEditorComponent
     feedbackTemplates.forEach((template) => {
       const parentOrder = orderMap.get(template.parentChipId) ?? 0;
       orderMap.set(template.id, parentOrder + orderMap.get(template.id)!);
-
     });
 
     // Sort again by computed hierarchical order
@@ -428,7 +425,7 @@ export class FeedbackTemplateEditorComponent
     this.csvUploadModal.show(
       `Upload ${type} as CSV`,
       'Test message',
-      { file: { name: `${type} CSV Data`, type: 'csv' } },
+      {file: {name: `${type} CSV Data`, type: 'csv'}},
       url,
       (response: any) => {
         this.csvResultModalService.show(`${type} CSV Upload Results`, response);
