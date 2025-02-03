@@ -332,7 +332,7 @@ export class FeedbackTemplateEditorComponent
     feedbackGroups.forEach((template) => {
       const parentOrder = template.parentChipId ? orderMap.get(template.parentChipId)! : 0;
       const depth = depthMap.get(template.id) ?? 0;
-      const multiplier = 10(maxDepth + 5 - depth * 3); // Proper scaling based on depth
+      const multiplier = 10 ** (maxDepth + 5 - depth * 3); // Proper scaling based on depth
       let oldOrder = orderMap.get(template.id)!;
 
       orderMap.set(template.id, parentOrder + orderMap.get(template.id)! * multiplier);
