@@ -25,12 +25,11 @@
 
     .extra-large-button {
       padding-top: 7px;
-      transform: scale(1.30);
-      background-color: #ffac2e;
+      transform: scale(1.25);
     }
 
     .extra-large-button:hover {
-      background-color: #e2992c;
+      filter: brightness(0.85);
     }
   }
 
@@ -47,5 +46,30 @@
     width: 15vw;
     margin-left: 20px;
     margin-right: 25px;
+  }
+}
+
+@import '../../../styles/mixins/task-status-colors-generator.scss';
+
+@mixin status-icon($status) {
+  background-color: task-status-color($status);
+  color: task-status-color($status, fore);
+}
+
+.status-chip {
+  &.feedback-exceeded {
+    @include status-icon('feedback-exceeded');
+  }
+  &.redo {
+    @include status-icon('redo');
+  }
+  &.fix-and-resubmit {
+    @include status-icon('fix-and-resubmit');
+  }
+  &.discuss {
+    @include status-icon('discuss');
+  }
+  &.complete {
+    @include status-icon('complete');
   }
 }

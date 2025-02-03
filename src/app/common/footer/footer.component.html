@@ -53,8 +53,9 @@
           }}"
           matTooltipPosition="above"
           aria-label=""
-          class="button extra-large-button"
+          class="button extra-large-button status-chip"
           (click)="selectedTask?.updateTaskStatus(selectedTask.suggestedTaskStatus)"
+          [ngClass]="taskService.statusData(selectedTask.suggestedTaskStatus).class"
         >
           <i class="fa {{ taskService.statusData(selectedTask.suggestedTaskStatus).icon }}"></i>
         </button>
