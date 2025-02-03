@@ -6,6 +6,7 @@
     [dataSource]="outcomeSource"
     matSort
     (matSortChange)="sortOutcomeData($event)"
+    #outcomeSort="matSort"
   >
     <ng-container matColumnDef="abbreviation" sticky>
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Abbreviation</th>
@@ -173,7 +174,9 @@
             />
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="select($event)">
               @for (outcome of filteredOutcomes(); track outcome) {
-                <mat-option [value]="outcome.abbreviation">{{ outcome.abbreviation }}</mat-option>
+                <mat-option [value]="outcome.abbreviation"
+                  >{{ outcome.abbreviation }} - {{ outcome.shortDescription }}</mat-option
+                >
               }
             </mat-autocomplete>
           </mat-form-field>
@@ -200,6 +203,7 @@
             [dataSource]="templateSource"
             matSort
             (matSortChange)="sortTemplateData($event)"
+            #templateSort="matSort"
           >
             <ng-container matColumnDef="icon" sticky>
               <th mat-header-cell *matHeaderCellDef></th>
