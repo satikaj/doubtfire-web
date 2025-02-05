@@ -15,6 +15,23 @@
   </mat-form-field>
 
   <div class="overflow-y-auto flex-grow pr-4 pl-4 pb-5 pt-0">
+    <div class="template-category mt-2 mb-2">
+      <div class="template-grid flex flex-wrap gap-1.5 mt-5">
+        <mat-chip
+          *ngFor="let template of genTemplates$ | async"
+          (mouseenter)="onHoverTemplate(template)"
+          (mouseleave)="onHoverTemplate(null)"
+          (click)="selectTemplate(template)"
+          class="px-2 py-1 rounded-full cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          [ngStyle]="isTemplateSelected(template) ? {'border': '1px solid'} : {}"
+          [hidden]="template.chipText === 'Summarise feedback' && selectedTemplates.length < 1"
+        >
+          <mat-icon *ngIf="isTemplateSelected(template)" matChipAvatar>check_circle</mat-icon>
+          {{ template.chipText }}
+        </mat-chip>
+      </div>
+    </div>
+
     <div #tloSection class="template-category mt-2 mb-2">
       <div *ngFor="let item of tlos$ | async" class="outcome-section mt-4">
         <h5 class="text-formatif-blue font-extrabold">

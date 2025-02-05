@@ -8,6 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   EventEmitter,
+  OnInit,
 } from '@angular/core';
 import {BehaviorSubject, combineLatest, map, Observable} from 'rxjs';
 import {
@@ -25,13 +26,16 @@ import {
   templateUrl: './task-feedback-templates.component.html',
   encapsulation: ViewEncapsulation.None,
 })
-export class TaskFeedbackTemplatesComponent implements OnChanges {
+export class TaskFeedbackTemplatesComponent implements OnInit, OnChanges {
   @Input() task: Task;
   @Output() templateSelected = new EventEmitter<FeedbackTemplate>();
 
   categories = ['TLO', 'ULO', 'GLO'];
   selectedTemplates: FeedbackTemplate[] = [];
   hoveredTemplate: FeedbackTemplate;
+
+  private generalTemplatesSubject = new BehaviorSubject<FeedbackTemplate[]>([]);
+  generalTemplates$ = this.generalTemplatesSubject.asObservable();
 
   private navigationStackSubject = new BehaviorSubject<Map<number, number[]>>(
     new Map<number, number[]>(),
@@ -41,6 +45,13 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
   private searchTermSubject = new BehaviorSubject<string>('');
   searchTerm$ = this.searchTermSubject.asObservable();
 
+  public genTemplates$ = combineLatest([this.generalTemplates$, this.searchTerm$]).pipe(
+    map(([templates, searchTerm]) =>
+      templates.filter((template) =>
+        template.chipText.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
+    ),
+  );
   public tlos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
   public ulos$: Observable<{outcome: LearningOutcome; templates: FeedbackTemplate[]}[]>;
   public glos$ = combineLatest([
@@ -66,7 +77,25 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
     private taskService: TaskService,
   ) {}
 
+  ngOnInit(): void {
+    const greetingTemplate = new FeedbackTemplate();
+    greetingTemplate.type = 'template';
+    greetingTemplate.chipText = 'Greeting';
+    greetingTemplate.description = 'Insert a greeting with the student\'s name.';
+
+    const summaryTemplate = new FeedbackTemplate();
+    summaryTemplate.type = 'template';
+    summaryTemplate.chipText = 'Summarise feedback';
+    summaryTemplate.description = 'Summarise the given feedback.';
+
+    this.generalTemplatesSubject.next([greetingTemplate, summaryTemplate]);
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
+    this.selectedTemplates = [];
+    this.navigationStackSubject.next(new Map<number, number[]>());
+    this.searchTermSubject.next('');
+
     if (this.task && this.task.definition) {
       this.tlos$ = combineLatest([
         this.task.definition.learningOutcomesCache.values,
@@ -161,6 +190,17 @@ export class TaskFeedbackTemplatesComponent implements OnChanges {
 
   selectTemplate(template: FeedbackTemplate) {
     if (template.type === 'template') {
+      if (template.chipText === 'Greeting') {
+        template.commentText = `Hi ${this.task.project.student.firstName}. `;
+      }
+      if (template.chipText === 'Summarise feedback') {
+        if (!this.selectedTemplates || this.selectedTemplates.length < 1) return;
+        template.commentText = 'Summary of the given feedback:';
+        this.selectedTemplates.forEach((t) => {
+          if (!t.summaryText) return;
+          template.commentText += '\n- ' + t.summaryText;
+        });
+      }
       this.selectedTemplates.push(template);
       this.templateSelected.emit(template);
       this.suggestTaskStatus(template);
