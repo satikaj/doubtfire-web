@@ -192,18 +192,18 @@ export class TaskFeedbackTemplatesComponent implements OnInit, OnChanges {
     if (template.type === 'template') {
       if (template.chipText === 'Greeting') {
         template.commentText = `Hi ${this.task.project.student.firstName}. `;
-      }
-      if (template.chipText === 'Summarise feedback') {
+      } else if (template.chipText === 'Summarise feedback') {
         if (!this.selectedTemplates || this.selectedTemplates.length < 1) return;
         template.commentText = 'Summary of the given feedback:';
         this.selectedTemplates.forEach((t) => {
           if (!t.summaryText) return;
           template.commentText += '\n- ' + t.summaryText;
         });
+      } else {
+        this.selectedTemplates.push(template);
+        this.suggestTaskStatus(template);
       }
-      this.selectedTemplates.push(template);
       this.templateSelected.emit(template);
-      this.suggestTaskStatus(template);
     } else {
       const updatedStack = new Map(this.navigationStackSubject.getValue());
       const outcomeStack = updatedStack.get(template.learningOutcomeId) || [];
