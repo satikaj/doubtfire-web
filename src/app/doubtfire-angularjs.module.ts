@@ -225,7 +225,7 @@ import {MarkedPipe} from './common/pipes/marked.pipe';
 import {AlertService} from './common/services/alert.service';
 import {GradeService} from './common/services/grade.service';
 import {TaskScormCardComponent} from './projects/states/dashboard/directives/task-dashboard/directives/task-scorm-card/task-scorm-card.component';
-import {FeedbackTemplateEditorComponent} from './common/feedback-template/feedback-template-editor.component';
+import {LearningOutcomeEditorComponent} from './common/learning-outcome-editor/learning-outcome-editor.component';
 import {FeedbackTemplateService} from './api/services/feedback-template.service';
 
 export const DoubtfireAngularJSModule = angular.module('doubtfire', [
@@ -471,8 +471,8 @@ DoubtfireAngularJSModule.directive(
   downgradeComponent({component: StatusIconComponent}),
 );
 DoubtfireAngularJSModule.directive(
-  'fFeedbackTemplateEditor',
-  downgradeComponent({component: FeedbackTemplateEditorComponent}),
+  'fLearningOutcomeEditor',
+  downgradeComponent({component: LearningOutcomeEditorComponent}),
 );
 DoubtfireAngularJSModule.directive('newFUnits', downgradeComponent({component: FUnitsComponent}));
 

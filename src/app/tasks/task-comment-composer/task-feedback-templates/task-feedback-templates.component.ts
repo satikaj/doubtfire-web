@@ -232,7 +232,7 @@ export class TaskFeedbackTemplatesComponent implements OnInit, OnChanges {
   }
 
   private suggestTaskStatus(template: FeedbackTemplate) {
-    if (this.task.suggestedTaskStatus) {
+    if (template.taskStatus && this.task.suggestedTaskStatus) {
       const currentSeq = this.taskService.statusSeq.get(this.task.suggestedTaskStatus);
       const templateSeq = this.taskService.statusSeq.get(template.taskStatus);
       if (templateSeq < currentSeq) this.task.suggestedTaskStatus = template.taskStatus;
