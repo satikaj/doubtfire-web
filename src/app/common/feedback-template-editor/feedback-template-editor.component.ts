@@ -26,7 +26,6 @@ import {
   csvUploadModalService,
 } from 'src/app/ajs-upgraded-providers';
 import {FileDownloaderService} from '../file-downloader/file-downloader.service';
-import { id } from 'date-fns/locale';
 
 @Component({
   selector: 'f-feedback-template-editor',
@@ -101,6 +100,15 @@ export class FeedbackTemplateEditorComponent implements OnChanges, AfterViewInit
   }
 
   public saveFeedbackTemplate(feedbackTemplate: FeedbackTemplate) {
+    if (
+      !feedbackTemplate.chipText.trim() ||
+      !feedbackTemplate.description.trim() ||
+      (feedbackTemplate.type === 'template' &&
+        (!feedbackTemplate.commentText.trim() || !feedbackTemplate.summaryText.trim()))
+    ) {
+      this.alerts.error('Failed to save feedback template. Fill in required fields.');
+      return;
+    }
     feedbackTemplate.save().subscribe({
       next: () => {
         this.alerts.success('Template saved');

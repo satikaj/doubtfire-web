@@ -187,6 +187,7 @@
               <input
                 matInput
                 required
+                pattern=".*\S.*"
                 [(ngModel)]="selectedTemplate.chipText"
                 maxlength="20"
                 placeholder="Short text shown on the chip"
@@ -198,6 +199,7 @@
               <input
                 matInput
                 required
+                pattern=".*\S.*"
                 [(ngModel)]="selectedTemplate.description"
                 maxlength="116"
                 placeholder="Description of the feedback template"
@@ -211,6 +213,7 @@
               <textarea
                 matInput
                 required
+                pattern=".*\S.*"
                 [(ngModel)]="selectedTemplate.commentText"
                 placeholder="Feedback text that is added to the comment area"
               >
@@ -223,6 +226,7 @@
                 <input
                   matInput
                   required
+                  pattern=".*\S.*"
                   [(ngModel)]="selectedTemplate.summaryText"
                   placeholder="Summary of the feedback"
                 />

@@ -158,6 +158,14 @@ export class LearningOutcomeEditorComponent implements OnChanges, AfterViewInit,
   }
 
   public saveLearningOutcome(learningOutcome: LearningOutcome) {
+    if (
+      !learningOutcome.abbreviation.trim() ||
+      !learningOutcome.shortDescription.trim() ||
+      !learningOutcome.fullOutcomeDescription.trim()
+    ) {
+      this.alerts.error('Failed to save learning outcome. Fill in required fields.');
+      return;
+    }
     learningOutcome.save().subscribe({
       next: () => {
         this.alerts.success('Outcome saved');
