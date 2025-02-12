@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.34](https://github.com/macite/doubtfire-deploy/compare/v8.0.33...v8.0.34) (2025-02-12)
+
+
+### Bug Fixes
+
+* enhance rollover messages ([48348c8](https://github.com/macite/doubtfire-deploy/commit/48348c8e6a7ffdb4186fe3e6d27fe860076922e1))
+
 ### [8.0.33](https://github.com/macite/doubtfire-deploy/compare/v8.0.32...v8.0.33) (2025-01-29)
 
 
